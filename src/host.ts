@@ -35,7 +35,7 @@ function getWasmModule(path: string, importObj: WebAssembly.Imports): Promise<We
     if (WebAssembly.instantiateStreaming) {
         // Streaming API allows browser to begin compiling the module while it
         // is downloading it.
-        return WebAssembly.instantiateStreaming(fetch(path), {})
+        return WebAssembly.instantiateStreaming(fetch(path), importObj)
     } else {
         // Fall back to the old API
         return fetch(path)
@@ -46,11 +46,17 @@ function getWasmModule(path: string, importObj: WebAssembly.Imports): Promise<We
 
 export async function retroInit(path: string): Promise<RetroModule> {
     const decoder = new TextDecoder()
-    let memory_bytes;
+    let memory_bytes: any;
     let exit_code;
 
+    function displayRocString(str_bytes, str_len) {
+        const utf8_bytes = memory_bytes.subarray(str_bytes, str_bytes + str_len);
+        const js_string = decoder.decode(utf8_bytes);
+        console.log(js_string);
+    }
+
     const importObj = {
-        was_snapshot_preview1: {
+        wasi_snapshot_preview1: {
             proc_exit: (code: number) => {
                 if (code !== 0) {
                     throw new RocExitError(`Exited with code ${code}`)
@@ -64,7 +70,8 @@ export async function retroInit(path: string): Promise<RetroModule> {
         env: {
             roc_panic: (_pointer: unknown, _tag_id: unknown) => {
                 throw new RocPanicError(`Remain calm! Do not panic! Roc panicked!`)
-            }
+            },
+            js_display_roc_string: displayRocString
         }
     }
 
