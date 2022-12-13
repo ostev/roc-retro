@@ -1,6 +1,5 @@
 export interface RetroModule {
     rocInstance: WebAssembly.Instance
-
 }
 
 export class RocExitError extends Error {
@@ -31,7 +30,10 @@ export class RocWasmInstanceStartError extends Error {
     }
 }
 
-function getWasmModule(path: string, importObj: WebAssembly.Imports): Promise<WebAssembly.WebAssemblyInstantiatedSource> {
+function getWasmModule(
+    path: string,
+    importObj: WebAssembly.Imports
+): Promise<WebAssembly.WebAssemblyInstantiatedSource> {
     if (WebAssembly.instantiateStreaming) {
         // Streaming API allows browser to begin compiling the module while it
         // is downloading it.
@@ -39,20 +41,20 @@ function getWasmModule(path: string, importObj: WebAssembly.Imports): Promise<We
     } else {
         // Fall back to the old API
         return fetch(path)
-            .then(response => response.arrayBuffer())
-            .then(bytes => WebAssembly.instantiate(bytes, importObj))
+            .then((response) => response.arrayBuffer())
+            .then((bytes) => WebAssembly.instantiate(bytes, importObj))
     }
 }
 
 export async function retroInit(path: string): Promise<RetroModule> {
     const decoder = new TextDecoder()
-    let memory_bytes: any;
-    let exit_code;
+    let memory_bytes: any
+    let exit_code
 
-    function displayRocString(str_bytes, str_len) {
-        const utf8_bytes = memory_bytes.subarray(str_bytes, str_bytes + str_len);
-        const js_string = decoder.decode(utf8_bytes);
-        console.log(js_string);
+    function displayRocString(str_bytes: any, str_len: any) {
+        const utf8_bytes = memory_bytes.subarray(str_bytes, str_bytes + str_len)
+        const js_string = decoder.decode(utf8_bytes)
+        console.log(js_string)
     }
 
     const importObj = {
@@ -64,12 +66,16 @@ export async function retroInit(path: string): Promise<RetroModule> {
                 exit_code = code
             },
             fd_write: (x: unknown) => {
-                throw new FdWriteNotSupportedErrror(`fd_write not supported: ${x}`)
+                throw new FdWriteNotSupportedErrror(
+                    `fd_write not supported: ${x}`
+                )
             }
         },
         env: {
             roc_panic: (_pointer: unknown, _tag_id: unknown) => {
-                throw new RocPanicError(`Remain calm! Do not panic! Roc panicked!`)
+                throw new RocPanicError(
+                    `Remain calm! Do not panic! Roc panicked!`
+                )
             },
             js_display_roc_string: displayRocString
         }
@@ -77,10 +83,12 @@ export async function retroInit(path: string): Promise<RetroModule> {
 
     const module = await getWasmModule(path, importObj)
 
-    memory_bytes = new Uint8Array((module.instance.exports.memory as any).buffer)
+    memory_bytes = new Uint8Array(
+        (module.instance.exports.memory as any).buffer
+    )
 
     try {
-        (module.instance.exports as any)._start();
+        ;(module.instance.exports as any)._start()
     } catch (e: any) {
         const is_ok = e.message == "unreachable" && exit_code == 0
 

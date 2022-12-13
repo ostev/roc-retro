@@ -10,9 +10,7 @@ export function toRGBA(
 
     for (let i = 0; i < framebuffer.length; i++) {
         ;[framebuffer[i] & 0b11110000, framebuffer[i] << 4]
-            .map((paletteIndex) =>
-                paletteIndex !== 0 ? palette[paletteIndex] : 0
-            )
+            .map((paletteIndex) => palette[paletteIndex])
             .forEach((color, j) => (rgba[i * 2 + j] = color))
     }
 

@@ -169,7 +169,9 @@ export function createTexture(
     gl: WebGLRenderingContext,
     width: number,
     height: number,
-    data: ArrayBufferView | null
+    data: ArrayBufferView | null,
+    format: number = gl.RGBA,
+    internalFormat: number = format
 ): WebGLTexture {
     const texture = gl.createTexture()
 
@@ -181,8 +183,7 @@ export function createTexture(
 
     gl.bindTexture(gl.TEXTURE_2D, texture)
 
-    const { level, internalFormat, border, format, type } =
-        defaultTextureOptions(gl)
+    const { level, border, type } = defaultTextureOptions(gl)
 
     gl.texImage2D(
         gl.TEXTURE_2D,
@@ -208,11 +209,12 @@ export function updateTexture(
     gl: WebGLRenderingContext,
     texture: WebGLTexture,
     data: ArrayBufferView,
-    dimensions: [number, number]
+    dimensions: [number, number],
+    format: number = gl.RGBA,
+    internalFormat: number = format
 ) {
     gl.bindTexture(gl.TEXTURE_2D, texture)
-    const { level, internalFormat, border, format, type } =
-        defaultTextureOptions(gl)
+    const { level, border, type } = defaultTextureOptions(gl)
     gl.texImage2D(
         gl.TEXTURE_2D,
         level,
