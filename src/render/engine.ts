@@ -1,6 +1,6 @@
 import { Dimensions } from "./dimensions"
-import { Framebuffer, toRGBA } from "./framebuffer"
-import { Palette, paletteToTextureData, paletteToVec4Array } from "./palette"
+import { Framebuffer } from "./framebuffer"
+import { Palette, paletteToTextureData, paletteSize } from "./palette"
 import { fragmentShader, vertexShader } from "./shaders"
 import {
     createProgramFromSources,
@@ -8,8 +8,6 @@ import {
     updateTexture
 } from "./webglUtils"
 import * as Matrix3 from "../math/matrix3"
-
-export const paletteSize = 16
 
 export class RenderEngine {
     private gl: WebGLRenderingContext

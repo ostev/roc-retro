@@ -31,3 +31,5 @@ export const paletteToTextureData = (palette: Palette): Uint8Array => {
 
     return textureData
 }
+
+export const paletteSize = 16
