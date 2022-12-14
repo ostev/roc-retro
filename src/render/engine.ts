@@ -15,8 +15,8 @@ export class RenderEngine {
     private framebufferTexture: WebGLTexture | undefined
     private shaderProgram: WebGLProgram
 
-    private paletteTexture: WebGLTexture | undefined
-    private previousPalette: Palette | undefined
+    // private paletteTexture: WebGLTexture | undefined
+    // private previousPalette: Palette | undefined
 
     private updateMatrix: (dimensions: Dimensions) => void
     private updatePositions: (dimensions: Dimensions) => void
@@ -111,7 +111,7 @@ export class RenderEngine {
             dimensions.height - dimensions.padding.bottom
         )
 
-        this.gl.clearColor(0, 0, 0, 1)
+        this.gl.clearColor(1, 1, 1, 1)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
         this.gl.activeTexture(this.gl.TEXTURE0)
@@ -120,35 +120,31 @@ export class RenderEngine {
                 this.gl,
                 dimensions.width,
                 dimensions.height,
-                framebuffer,
-                this.gl.LUMINANCE
+                framebuffer
             )
         } else {
-            updateTexture(
-                this.gl,
-                this.framebufferTexture,
-                framebuffer,
-                [dimensions.width, dimensions.height],
-                this.gl.LUMINANCE
-            )
+            updateTexture(this.gl, this.framebufferTexture, framebuffer, [
+                dimensions.width,
+                dimensions.height
+            ])
         }
 
-        this.gl.activeTexture(this.gl.TEXTURE1)
-        if (this.paletteTexture === undefined) {
-            this.paletteTexture = createTexture(
-                this.gl,
-                paletteSize,
-                1,
-                paletteToTextureData(palette)
-            )
-        } else if (palette !== this.previousPalette) {
-            updateTexture(
-                this.gl,
-                this.paletteTexture,
-                paletteToTextureData(palette),
-                [paletteSize, 1]
-            )
-        }
+        // this.gl.activeTexture(this.gl.TEXTURE1)
+        // if (this.paletteTexture === undefined) {
+        //     this.paletteTexture = createTexture(
+        //         this.gl,
+        //         paletteSize,
+        //         1,
+        //         paletteToTextureData(palette)
+        //     )
+        // } else if (palette !== this.previousPalette) {
+        //     updateTexture(
+        //         this.gl,
+        //         this.paletteTexture,
+        //         paletteToTextureData(palette),
+        //         [paletteSize, 1]
+        //     )
+        // }
 
         this.updateMatrix(dimensions)
         this.updatePositions(dimensions)

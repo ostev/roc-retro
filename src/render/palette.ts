@@ -1,5 +1,10 @@
 export type Palette = Uint32Array
 
+export const paletteSize = 16
+
+export const createPalette = (palette: number[]): Palette =>
+    new Uint32Array(paletteSize).map((_, i) => palette[i] || 0x00000000)
+
 export const paletteToVec4Array = (palette: Palette): number[] => {
     const vec4Array = []
 
@@ -26,10 +31,8 @@ export const paletteToTextureData = (palette: Palette): Uint8Array => {
         textureData[i * 4 + 0] = (color & 0xff000000) >>> 24
         textureData[i * 4 + 1] = (color & 0x00ff0000) >>> 16
         textureData[i * 4 + 2] = (color & 0x0000ff00) >>> 8
-        textureData[i * 4 + 3] = (color & 0x000000ff) >>> 0
+        textureData[i * 4 + 3] = 0xff
     }
 
     return textureData
 }
-
-export const paletteSize = 16

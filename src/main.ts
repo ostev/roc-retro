@@ -1,6 +1,11 @@
 import { retroInit } from "./host"
 import { RenderEngine } from "./render/engine"
-import { paletteToVec4Array } from "./render/palette"
+import { toRGBA } from "./render/framebuffer"
+import {
+    createPalette,
+    paletteToTextureData,
+    paletteToVec4Array
+} from "./render/palette"
 
 await retroInit("/game.wasm")
 
@@ -28,17 +33,16 @@ if (gl === null) {
 
 const framebuffer = new Uint8Array(256 * 256)
 for (let i = 0; i < framebuffer.length; i++) {
-    if (i % 256 < 128) {
-        framebuffer[i] = 0x10
-    } else {
-        framebuffer[i] = 0x20
-    }
+    framebuffer[i] = 0x23
 }
-const palette = new Uint32Array(16)
-palette[0] = 0xff0000ff
-palette[1] = 0x00ff00ff
-palette[2] = 0x0000ffff
-palette[3] = 0xffffffff
+const palette = new Uint32Array([
+    0x00000000, 0xffffffff, 0x00000000, 0x00000000
+])
+console.log(`Palette: ${palette}`)
+console.log(`Palette as texture data: ${paletteToTextureData(palette)}`)
+console.log(framebuffer)
+console.log(toRGBA(palette, framebuffer))
+console.log((framebuffer[0] & 0x0f) << 4)
 
 const renderEngine = new RenderEngine(gl)
 renderEngine.render(framebuffer, palette, {

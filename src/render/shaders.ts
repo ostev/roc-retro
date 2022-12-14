@@ -1,3 +1,5 @@
+import { paletteSize } from "./palette"
+
 export const vertexShader = `
     attribute vec2 a_position;
 
@@ -20,11 +22,11 @@ export const fragmentShader = `
     varying vec2 v_texcoord;
     uniform sampler2D u_framebuffer;
 
-    uniform sampler2D u_palette;
+    // uniform sampler2D u_palette;
 
     void main() {
-        float color = texture2D(u_framebuffer, v_texcoord).r;
+        // float color = texture2D(u_framebuffer, v_texcoord).r;
 
-        gl_FragColor = texture2D(u_palette, vec2(color, 0));
+        gl_FragColor = vec4(texture2D(u_framebuffer, v_texcoord).rgb, 1.0);
     }
 `
