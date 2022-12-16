@@ -3,6 +3,7 @@ import { RenderEngine } from "./render/engine"
 // import { toRGBA } from "./render/framebuffer"
 import {
     createPalette,
+    floatLookup,
     paletteToTextureData,
     paletteToVec3Array
 } from "./render/palette"
@@ -39,7 +40,7 @@ for (let i = 0; i < framebuffer.length; i++) {
     framebuffer[i] = 0x33
 }
 const palette = new Uint32Array([
-    0x00ff0000, 0xff00ff00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x00000000,
+    0x00ffff00, 0xff005f00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x00000000,
     0x00000000, 0x00000000
 ])
 console.log(`Palette: ${palette}`)
@@ -62,8 +63,12 @@ console.log(byteFramebuffer)
 
 const floatFramebuffer = new Float32Array(256 * 256)
 floatFramebuffer.forEach((float, i) => {
-    floatFramebuffer[i] = 0.2
+    floatFramebuffer[i] = 1
 })
+
+console.log(floatFramebuffer)
+
+console.log("Float lookup table: ", floatLookup)
 
 const renderEngine = new RenderEngine(gl)
 
@@ -71,7 +76,7 @@ let renderTime = 0
 
 const render = () => {
     renderTime = benchmark(() =>
-        renderEngine.render(floatFramebuffer, palette, {
+        renderEngine.render(byteFramebuffer, palette, {
             width: 256,
             height: 256
         })

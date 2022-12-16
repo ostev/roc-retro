@@ -17,13 +17,18 @@ export const vertexShader = `
 `
 
 const paletteLookup = Array.from({ length: paletteSize })
-    .map(
-        (_, i) =>
-            `
-            if (color == float(${floatLookup[i]})) {
-                        gl_FragColor = vec4(u_palette[${i}], 1.0);
-            }
-            `
+    .map((_, i) =>
+        i === 0
+            ? `
+                if (color == 0.0) {
+                    gl_FragColor = vec4(u_palette[0], 1.0);
+                }
+                `
+            : `
+                if (color != 0.0 && abs((color) - (((1.0 / 255.0) * float(${i})))) < 0.01) {
+                    gl_FragColor = vec4(u_palette[${i}], 1.0);
+                }
+                `
     )
     .join(" else ")
 

@@ -132,8 +132,8 @@ export class RenderEngine {
                 dimensions.height,
                 framebuffer,
                 this.gl.LUMINANCE,
-                this.gl.LUMINANCE,
-                this.gl.FLOAT
+                this.gl.LUMINANCE
+                // this.gl.FLOAT
             )
         } else {
             updateTexture(
@@ -142,8 +142,8 @@ export class RenderEngine {
                 framebuffer,
                 [dimensions.width, dimensions.height],
                 this.gl.LUMINANCE,
-                this.gl.LUMINANCE,
-                this.gl.FLOAT
+                this.gl.LUMINANCE
+                // this.gl.FLOAT
             )
         }
 

@@ -1,6 +1,6 @@
 import { Palette, paletteToTextureData } from "./palette"
 
-export type Framebuffer = Float32Array
+export type Framebuffer = Uint8Array
 
 export interface FramebufferDimensions {
     width: number
