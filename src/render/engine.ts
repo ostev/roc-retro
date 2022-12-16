@@ -1,5 +1,5 @@
 import { Dimensions } from "./dimensions"
-import { Framebuffer } from "./framebuffer"
+import { Framebuffer, FramebufferDimensions, toRGBA } from "./framebuffer"
 import { Palette, paletteToTextureData, paletteSize } from "./palette"
 import { fragmentShader, vertexShader } from "./shaders"
 import {
@@ -91,8 +91,8 @@ export class RenderEngine {
 
         this.updateMatrix = (dimensions: Dimensions) => {
             const matrix = Matrix3.projection(
-                dimensions.width - dimensions.padding.right,
-                dimensions.height - dimensions.padding.bottom
+                dimensions.width,
+                dimensions.height
             )
 
             gl.uniformMatrix3fv(matrixLocation, false, matrix)
@@ -104,12 +104,23 @@ export class RenderEngine {
         palette: Palette,
         dimensions: Dimensions
     ) => {
-        this.gl.viewport(
-            0,
-            0,
-            dimensions.width - dimensions.padding.right,
-            dimensions.height - dimensions.padding.bottom
-        )
+        const framebufferDimensions: FramebufferDimensions = {
+            width: Math.ceil(dimensions.width / 2),
+            height: Math.ceil(dimensions.height / 2),
+            padding: {
+                right: dimensions.width % 2,
+                bottom: dimensions.height % 2
+            }
+        }
+
+        const paddedDimensions: Dimensions = {
+            width: framebufferDimensions.width * 2,
+            height: framebufferDimensions.height * 2
+        }
+
+        const rgba = toRGBA(palette, framebuffer)
+
+        this.gl.viewport(0, 0, dimensions.width, dimensions.height)
 
         this.gl.clearColor(1, 1, 1, 1)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
@@ -120,13 +131,19 @@ export class RenderEngine {
                 this.gl,
                 dimensions.width,
                 dimensions.height,
-                framebuffer
+                rgba,
+                this.gl.RGBA,
+                this.gl.RGBA
             )
         } else {
-            updateTexture(this.gl, this.framebufferTexture, framebuffer, [
-                dimensions.width,
-                dimensions.height
-            ])
+            updateTexture(
+                this.gl,
+                this.framebufferTexture,
+                rgba,
+                [dimensions.width, dimensions.height],
+                this.gl.RGBA,
+                this.gl.RGBA
+            )
         }
 
         // this.gl.activeTexture(this.gl.TEXTURE1)
@@ -146,8 +163,8 @@ export class RenderEngine {
         //     )
         // }
 
-        this.updateMatrix(dimensions)
-        this.updatePositions(dimensions)
+        this.updateMatrix(paddedDimensions)
+        this.updatePositions(paddedDimensions)
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6)
     }

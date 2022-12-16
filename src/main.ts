@@ -6,6 +6,7 @@ import {
     paletteToTextureData,
     paletteToVec4Array
 } from "./render/palette"
+import { benchmark } from "./benchmark"
 
 await retroInit("/game.wasm")
 
@@ -31,7 +32,7 @@ if (gl === null) {
     throw new WebGLNotSupportedError("WebGL is not supported")
 }
 
-const framebuffer = new Uint8Array(256 * 256)
+const framebuffer = new Uint8Array((256 * 256) / 2)
 for (let i = 0; i < framebuffer.length; i++) {
     framebuffer[i] = 0x20
 }
@@ -44,12 +45,24 @@ console.log(framebuffer)
 console.log(toRGBA(palette, framebuffer))
 console.log((framebuffer[0] & 0x0f) << 4)
 
+console.log(
+    `toRGBA executation time: ${benchmark(() => toRGBA(palette, framebuffer))}`
+)
+
 const renderEngine = new RenderEngine(gl)
-renderEngine.render(framebuffer, palette, {
-    width: 256,
-    height: 256,
-    padding: {
-        right: 0,
-        bottom: 0
-    }
-})
+
+let renderTime = 0
+
+const render = () => {
+    renderTime = benchmark(() =>
+        renderEngine.render(framebuffer, palette, {
+            width: 256,
+            height: 256
+        })
+    )
+    requestAnimationFrame(render)
+}
+
+setInterval(() => console.log(renderTime), 10000)
+
+render()
