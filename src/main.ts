@@ -4,7 +4,7 @@ import { toRGBA } from "./render/framebuffer"
 import {
     createPalette,
     paletteToTextureData,
-    paletteToVec4Array
+    paletteToVec3Array
 } from "./render/palette"
 import { benchmark } from "./benchmark"
 
@@ -34,13 +34,15 @@ if (gl === null) {
 
 const framebuffer = new Uint8Array((256 * 256) / 2)
 for (let i = 0; i < framebuffer.length; i++) {
-    framebuffer[i] = 0x20
+    framebuffer[i] = 0x33
 }
 const palette = new Uint32Array([
-    0x00000000, 0xffffffff, 0x00000000, 0x00000000
+    0x00ff0000, 0xff00ff00, 0xffffff00, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000
 ])
 console.log(`Palette: ${palette}`)
 console.log(`Palette as texture data: ${paletteToTextureData(palette)}`)
+console.log(`Palette as vec3 array ${paletteToVec3Array(palette)}`)
 console.log(framebuffer)
 console.log(toRGBA(palette, framebuffer))
 console.log((framebuffer[0] & 0x0f) << 4)
@@ -49,13 +51,20 @@ console.log(
     `toRGBA executation time: ${benchmark(() => toRGBA(palette, framebuffer))}`
 )
 
+const byteFramebuffer = new Uint8Array(256 * 256)
+byteFramebuffer.forEach((byte, i) => {
+    byteFramebuffer[i] = 0x01
+})
+
+console.log(byteFramebuffer)
+
 const renderEngine = new RenderEngine(gl)
 
 let renderTime = 0
 
 const render = () => {
     renderTime = benchmark(() =>
-        renderEngine.render(framebuffer, palette, {
+        renderEngine.render(byteFramebuffer, palette, {
             width: 256,
             height: 256
         })

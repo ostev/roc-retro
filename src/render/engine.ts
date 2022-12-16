@@ -65,7 +65,6 @@ export class RenderEngine {
             this.shaderProgram,
             "u_palette"
         )
-        this.gl.uniform1i(paletteLocation, 1)
 
         const matrixLocation = gl.getUniformLocation(
             this.shaderProgram,
@@ -73,7 +72,7 @@ export class RenderEngine {
         )
 
         this.updatePalette = (palette) => {
-            this.gl.uniform4fv(paletteLocation, paletteToVec3Array(palette))
+            this.gl.uniform3fv(paletteLocation, paletteToVec3Array(palette))
         }
 
         this.updatePositions = (dimensions: Dimensions) => {
@@ -115,21 +114,10 @@ export class RenderEngine {
         palette: Palette,
         dimensions: Dimensions
     ) => {
-        const framebufferDimensions: FramebufferDimensions = {
-            width: Math.ceil(dimensions.width / 2),
-            height: Math.ceil(dimensions.height / 2),
-            padding: {
-                right: dimensions.width % 2,
-                bottom: dimensions.height % 2
-            }
-        }
-
         const paddedDimensions: Dimensions = {
-            width: framebufferDimensions.width * 2,
-            height: framebufferDimensions.height * 2
+            width: dimensions.width + (dimensions.width % 2),
+            height: dimensions.height + (dimensions.height % 2)
         }
-
-        const rgba = toRGBA(palette, framebuffer)
 
         this.gl.viewport(0, 0, dimensions.width, dimensions.height)
 
@@ -142,18 +130,18 @@ export class RenderEngine {
                 this.gl,
                 dimensions.width,
                 dimensions.height,
-                rgba,
-                this.gl.RGBA,
-                this.gl.RGBA
+                framebuffer,
+                this.gl.LUMINANCE,
+                this.gl.LUMINANCE
             )
         } else {
             updateTexture(
                 this.gl,
                 this.framebufferTexture,
-                rgba,
+                framebuffer,
                 [dimensions.width, dimensions.height],
-                this.gl.RGBA,
-                this.gl.RGBA
+                this.gl.LUMINANCE,
+                this.gl.LUMINANCE
             )
         }
 

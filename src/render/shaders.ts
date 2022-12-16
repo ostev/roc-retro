@@ -15,6 +15,22 @@ export const vertexShader = `
         v_texcoord = gl_Position.xy;
     }
 `
+
+const paletteLookup = Array.from({ length: paletteSize })
+    .map(
+        (_, i) =>
+            `
+            if (color == (1.0 / 255.0) * ${i}.0) {
+                ${
+                    i === 10
+                        ? `gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);`
+                        : `gl_FragColor = vec4(u_palette[${i}], 1.0);`
+                }
+            }
+            `
+    )
+    .join(" else ")
+
 export const fragmentShader = `
     precision mediump float;
 
@@ -22,16 +38,13 @@ export const fragmentShader = `
     varying vec2 v_texcoord;
     uniform sampler2D u_framebuffer;
 
-    uniform vec4 u_palette[16];
+    uniform vec3 u_palette[${paletteSize}];
 
     void main() {
-        // float color = texture2D(u_framebuffer, v_texcoord).r;
+        float color = texture2D(u_framebuffer, v_texcoord).r;
 
-        if (texture2D(u_framebuffer, v_texcoord).r == (1.0 / 255.0) * 10.0) {
-            gl_FragColor = vec4(u_palette[10].rgb, 1.0);
-        }
+        ${paletteLookup}
+        // gl_FragColor = vec4(color * 50.0, color * 50.0, 0.0, 1.0);
 
-
-        gl_FragColor = vec4(texture2D(u_framebuffer, v_texcoord).rgb, 1.0);
     }
 `
