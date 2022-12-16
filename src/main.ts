@@ -33,7 +33,7 @@ if (gl === null) {
 
 const framebuffer = new Uint8Array(256 * 256)
 for (let i = 0; i < framebuffer.length; i++) {
-    framebuffer[i] = 0x23
+    framebuffer[i] = 0x20
 }
 const palette = new Uint32Array([
     0x00000000, 0xffffffff, 0x00000000, 0x00000000

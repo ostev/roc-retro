@@ -16,12 +16,12 @@ export function toRGBA(palette: Palette, framebuffer: Framebuffer): Uint8Array {
     )
 
     console.log(
-        `First RGBA pixel: ${paletteData[firstPixel]}, ${
-            paletteData[firstPixel + 1]
-        }, ${paletteData[firstPixel + 2]}, ${0xff}`
+        `First RGBA pixel: ${paletteData[firstPixel * 4]}, ${
+            paletteData[firstPixel * 4 + 1]
+        }, ${paletteData[firstPixel * 4 + 2]}, ${0xff}`
     )
 
-    console.log(`sampled r: ${paletteData[framebuffer[0] & 0xf0]}`)
+    console.log(`sampled r: ${paletteData[(framebuffer[0] & 0xf0) * 4]}`)
 
     for (let i = 0; i < framebuffer.length; i++) {
         ;[(framebuffer[i] & 0xf0) >>> 4, (framebuffer[i] & 0x0f) >>> 0]
@@ -32,7 +32,7 @@ export function toRGBA(palette: Palette, framebuffer: Framebuffer): Uint8Array {
                 0xff
             ])
             .forEach((component, j) => {
-                rgba[i * 2 + j] = component
+                rgba[i * 8 + j] = component
             })
     }
 
