@@ -22,10 +22,15 @@ export const fragmentShader = `
     varying vec2 v_texcoord;
     uniform sampler2D u_framebuffer;
 
-    // uniform sampler2D u_palette;
+    uniform vec4 u_palette[16];
 
     void main() {
         // float color = texture2D(u_framebuffer, v_texcoord).r;
+
+        if (texture2D(u_framebuffer, v_texcoord).r == (1.0 / 255.0) * 10.0) {
+            gl_FragColor = vec4(u_palette[10].rgb, 1.0);
+        }
+
 
         gl_FragColor = vec4(texture2D(u_framebuffer, v_texcoord).rgb, 1.0);
     }

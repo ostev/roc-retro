@@ -5,17 +5,16 @@ export const paletteSize = 16
 export const createPalette = (palette: number[]): Palette =>
     new Uint32Array(paletteSize).map((_, i) => palette[i] || 0x00000000)
 
-export const paletteToVec4Array = (palette: Palette): number[] => {
+export const paletteToVec3Array = (palette: Palette): number[] => {
     const vec4Array = []
 
     for (let i = 0; i < palette.length; i++) {
         const color = palette[i]
 
         vec4Array.push(
-            (color & 0xff000000) >>> 24,
-            (color & 0x00ff0000) >>> 16,
-            (color & 0x0000ff00) >>> 8,
-            (color & 0x000000ff) >>> 0
+            ((color & 0xff000000) >>> 24) / 255,
+            ((color & 0x00ff0000) >>> 16) / 255,
+            ((color & 0x0000ff00) >>> 8) / 255
         )
     }
 

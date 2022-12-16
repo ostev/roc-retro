@@ -1,6 +1,11 @@
 import { Dimensions } from "./dimensions"
 import { Framebuffer, FramebufferDimensions, toRGBA } from "./framebuffer"
-import { Palette, paletteToTextureData, paletteSize } from "./palette"
+import {
+    Palette,
+    paletteToTextureData,
+    paletteSize,
+    paletteToVec3Array
+} from "./palette"
 import { fragmentShader, vertexShader } from "./shaders"
 import {
     createProgramFromSources,
@@ -20,6 +25,8 @@ export class RenderEngine {
 
     private updateMatrix: (dimensions: Dimensions) => void
     private updatePositions: (dimensions: Dimensions) => void
+
+    private updatePalette: (palette: Palette) => void
 
     constructor(gl: WebGLRenderingContext) {
         this.gl = gl
@@ -64,6 +71,10 @@ export class RenderEngine {
             this.shaderProgram,
             "u_matrix"
         )
+
+        this.updatePalette = (palette) => {
+            this.gl.uniform4fv(paletteLocation, paletteToVec3Array(palette))
+        }
 
         this.updatePositions = (dimensions: Dimensions) => {
             // A rectangle
@@ -162,6 +173,8 @@ export class RenderEngine {
         //         [paletteSize, 1]
         //     )
         // }
+
+        this.updatePalette(palette)
 
         this.updateMatrix(paddedDimensions)
         this.updatePositions(paddedDimensions)
