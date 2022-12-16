@@ -1,5 +1,5 @@
 import { Dimensions } from "./dimensions"
-import { Framebuffer, FramebufferDimensions, toRGBA } from "./framebuffer"
+import { Framebuffer, FramebufferDimensions } from "./framebuffer"
 import {
     Palette,
     paletteToTextureData,
@@ -132,7 +132,8 @@ export class RenderEngine {
                 dimensions.height,
                 framebuffer,
                 this.gl.LUMINANCE,
-                this.gl.LUMINANCE
+                this.gl.LUMINANCE,
+                this.gl.FLOAT
             )
         } else {
             updateTexture(
@@ -141,7 +142,8 @@ export class RenderEngine {
                 framebuffer,
                 [dimensions.width, dimensions.height],
                 this.gl.LUMINANCE,
-                this.gl.LUMINANCE
+                this.gl.LUMINANCE,
+                this.gl.FLOAT
             )
         }
 

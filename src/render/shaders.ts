@@ -1,4 +1,4 @@
-import { paletteSize } from "./palette"
+import { floatLookup, paletteSize } from "./palette"
 
 export const vertexShader = `
     attribute vec2 a_position;
@@ -20,12 +20,8 @@ const paletteLookup = Array.from({ length: paletteSize })
     .map(
         (_, i) =>
             `
-            if (color == (1.0 / 255.0) * ${i}.0) {
-                ${
-                    i === 10
-                        ? `gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);`
-                        : `gl_FragColor = vec4(u_palette[${i}], 1.0);`
-                }
+            if (color == float(${floatLookup[i]})) {
+                        gl_FragColor = vec4(u_palette[${i}], 1.0);
             }
             `
     )

@@ -1,6 +1,6 @@
 import { retroInit } from "./host"
 import { RenderEngine } from "./render/engine"
-import { toRGBA } from "./render/framebuffer"
+// import { toRGBA } from "./render/framebuffer"
 import {
     createPalette,
     paletteToTextureData,
@@ -32,24 +32,26 @@ if (gl === null) {
     throw new WebGLNotSupportedError("WebGL is not supported")
 }
 
+gl.getExtension("OES_texture_float")
+
 const framebuffer = new Uint8Array((256 * 256) / 2)
 for (let i = 0; i < framebuffer.length; i++) {
     framebuffer[i] = 0x33
 }
 const palette = new Uint32Array([
-    0x00ff0000, 0xff00ff00, 0xffffff00, 0x00000000, 0x00000000, 0x00000000,
+    0x00ff0000, 0xff00ff00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x00000000,
     0x00000000, 0x00000000
 ])
 console.log(`Palette: ${palette}`)
 console.log(`Palette as texture data: ${paletteToTextureData(palette)}`)
 console.log(`Palette as vec3 array ${paletteToVec3Array(palette)}`)
 console.log(framebuffer)
-console.log(toRGBA(palette, framebuffer))
+// console.log(toRGBA(palette, framebuffer))
 console.log((framebuffer[0] & 0x0f) << 4)
 
-console.log(
-    `toRGBA executation time: ${benchmark(() => toRGBA(palette, framebuffer))}`
-)
+// console.log(
+//     `toRGBA execution time: ${benchmark(() => toRGBA(palette, framebuffer))}`
+// )
 
 const byteFramebuffer = new Uint8Array(256 * 256)
 byteFramebuffer.forEach((byte, i) => {
@@ -58,13 +60,18 @@ byteFramebuffer.forEach((byte, i) => {
 
 console.log(byteFramebuffer)
 
+const floatFramebuffer = new Float32Array(256 * 256)
+floatFramebuffer.forEach((float, i) => {
+    floatFramebuffer[i] = 0.2
+})
+
 const renderEngine = new RenderEngine(gl)
 
 let renderTime = 0
 
 const render = () => {
     renderTime = benchmark(() =>
-        renderEngine.render(byteFramebuffer, palette, {
+        renderEngine.render(floatFramebuffer, palette, {
             width: 256,
             height: 256
         })

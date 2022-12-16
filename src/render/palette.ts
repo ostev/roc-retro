@@ -2,6 +2,8 @@ export type Palette = Uint32Array
 
 export const paletteSize = 16
 
+export const floatLookup = new Float32Array(paletteSize).map((_, i) => i * 0.05)
+
 export const createPalette = (palette: number[]): Palette =>
     new Uint32Array(paletteSize).map((_, i) => palette[i] || 0x00000000)
 
