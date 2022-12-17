@@ -99,6 +99,11 @@ export class RenderEngine {
         }
 
         this.updatePositions = (dimensions: Dimensions) => {
+            /* The position and texcoords are separate due to their different ranges:
+            `0` to `dimensions.width` and `0` to `dimensions.height` for the positions,
+            and `0` to `1` for the texcoords.
+            */
+
             // A rectangle
             const positions = new Float32Array([
                 // Left triangle
