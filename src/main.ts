@@ -40,13 +40,13 @@ for (let i = 0; i < framebuffer.length; i++) {
     framebuffer[i] = 0x33
 }
 const palette = new Uint32Array([
-    0x00ffff00, 0xff005f00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x00000000,
+    0x00ffff00, 0xff005f00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x5f209000,
     0x00000000, 0x00000000
 ])
-console.log(`Palette: ${palette}`)
-console.log(`Palette as texture data: ${paletteToTextureData(palette)}`)
-console.log(`Palette as vec3 array ${paletteToVec3Array(palette)}`)
-console.log(framebuffer)
+console.log("Palette: ", palette)
+console.log("Palette as texture data: ", paletteToTextureData(palette))
+console.log("Palette as vec3 array ", paletteToVec3Array(palette))
+console.log("Nibble framebuffer: ", framebuffer)
 // console.log(toRGBA(palette, framebuffer))
 console.log((framebuffer[0] & 0x0f) << 4)
 
@@ -54,20 +54,14 @@ console.log((framebuffer[0] & 0x0f) << 4)
 //     `toRGBA execution time: ${benchmark(() => toRGBA(palette, framebuffer))}`
 // )
 
-const byteFramebuffer = new Uint8Array(256 * 256)
-byteFramebuffer.forEach((byte, i) => {
-    byteFramebuffer[i] = 0x01
-})
-
-console.log(byteFramebuffer)
+// console.log("Byte framebuffer: ", byteFramebuffer)
 
 const floatFramebuffer = new Float32Array(256 * 256)
 floatFramebuffer.forEach((float, i) => {
     floatFramebuffer[i] = 1
 })
 
-console.log(floatFramebuffer)
-
+console.log("Float framebuffer: ", floatFramebuffer)
 console.log("Float lookup table: ", floatLookup)
 
 const renderEngine = new RenderEngine(gl)
@@ -75,13 +69,28 @@ const renderEngine = new RenderEngine(gl)
 let renderTime = 0
 
 const render = () => {
-    renderTime = benchmark(() =>
+    renderTime = benchmark(() => {
+        // const framebufferDimensions = {
+        //     width: Math.ceil(window.innerWidth / 2),
+        //     height: Math.ceil(window.innerHeight / 2)
+        // }
+        // console.log(framebufferDimensions)
+
+        const byteFramebuffer = new Uint8Array(256 * 256)
+        byteFramebuffer.forEach((_, i) => {
+            if (i % 256 < 128) {
+                byteFramebuffer[i] = 1
+            } else {
+                byteFramebuffer[i] = 0
+            }
+        })
+        // byteFramebuffer[0] = 1
         renderEngine.render(byteFramebuffer, palette, {
             width: 256,
             height: 256
         })
-    )
-    requestAnimationFrame(render)
+    })
+    // requestAnimationFrame(render)
 }
 
 setInterval(() => console.log(renderTime), 10000)

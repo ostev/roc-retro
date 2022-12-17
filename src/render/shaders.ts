@@ -2,6 +2,7 @@ import { floatLookup, paletteSize } from "./palette"
 
 export const vertexShader = `
     attribute vec2 a_position;
+    attribute vec2 a_texcoord;
 
     uniform mat3 u_matrix;
 
@@ -12,7 +13,7 @@ export const vertexShader = `
         gl_Position = vec4((u_matrix * vec3(a_position, 1)).xy, 0, 1);
 
         // Pass the texture coordinate to the fragment shader
-        v_texcoord = gl_Position.xy;
+        v_texcoord = a_texcoord;
     }
 `
 
@@ -25,7 +26,7 @@ const paletteLookup = Array.from({ length: paletteSize })
                 }
                 `
             : `
-                if (color != 0.0 && abs((color) - (((1.0 / 255.0) * float(${i})))) < 0.01) {
+                if (color != 0.0 && int(color * 255.0) == ${i}) {
                     gl_FragColor = vec4(u_palette[${i}], 1.0);
                 }
                 `
@@ -40,6 +41,7 @@ export const fragmentShader = `
     uniform sampler2D u_framebuffer;
 
     uniform vec3 u_palette[${paletteSize}];
+
 
     void main() {
         float color = texture2D(u_framebuffer, v_texcoord).r;

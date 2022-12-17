@@ -14,6 +14,8 @@ import {
 } from "./webglUtils"
 import * as Matrix3 from "../math/matrix3"
 
+const framebufferScalingFactor = 2
+
 export class RenderEngine {
     private gl: WebGLRenderingContext
 
@@ -38,16 +40,37 @@ export class RenderEngine {
         )
         gl.useProgram(this.shaderProgram)
 
+        // Set texture alignment to 1 so we can have textures
+        // with arbitrary dimensions
+        gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
+
         const positionAttributeLocation = gl.getAttribLocation(
             this.shaderProgram,
             "a_position"
         )
         const positionBuffer = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(3), gl.STATIC_DRAW)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(6), gl.DYNAMIC_DRAW)
         gl.enableVertexAttribArray(positionAttributeLocation)
         gl.vertexAttribPointer(
             positionAttributeLocation,
+            2,
+            gl.FLOAT,
+            false,
+            0,
+            0
+        )
+
+        const texcoordAttributeLocation = gl.getAttribLocation(
+            this.shaderProgram,
+            "a_texcoord"
+        )
+        const texcoordBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(6), gl.STATIC_DRAW)
+        gl.enableVertexAttribArray(texcoordAttributeLocation)
+        gl.vertexAttribPointer(
+            texcoordAttributeLocation,
             2,
             gl.FLOAT,
             false,
@@ -95,8 +118,17 @@ export class RenderEngine {
             ])
 
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-
             gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW)
+
+            const texCoords = new Float32Array([
+                // Left triangle
+                0, 0, 1, 0, 0, 1,
+                // Right triangle
+                0, 1, 1, 0, 1, 1
+            ])
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer)
+            gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.DYNAMIC_DRAW)
         }
 
         this.updateMatrix = (dimensions: Dimensions) => {
@@ -114,10 +146,14 @@ export class RenderEngine {
         palette: Palette,
         dimensions: Dimensions
     ) => {
-        const paddedDimensions: Dimensions = {
-            width: dimensions.width + (dimensions.width % 2),
-            height: dimensions.height + (dimensions.height % 2)
-        }
+        // const dimensions = {
+        //     width: Math.ceil(
+        //         displayDimensions.width / framebufferScalingFactor
+        //     ),
+        //     height: Math.ceil(
+        //         displayDimensions.height / framebufferScalingFactor
+        //     )
+        // }
 
         this.gl.viewport(0, 0, dimensions.width, dimensions.height)
 
@@ -166,8 +202,8 @@ export class RenderEngine {
 
         this.updatePalette(palette)
 
-        this.updateMatrix(paddedDimensions)
-        this.updatePositions(paddedDimensions)
+        this.updateMatrix(dimensions)
+        this.updatePositions(dimensions)
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6)
     }
