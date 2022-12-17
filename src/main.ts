@@ -20,12 +20,9 @@ class WebGLNotSupportedError extends Error {
 
 // Draw a basic scene
 const canvas = document.createElement("canvas")
+canvas.id = "display"
 canvas.width = 256
 canvas.height = 256
-canvas.setAttribute(
-    "style",
-    "position: absolute; top: 0; left: 0; width: 256px; height: 256px;"
-)
 document.body.appendChild(canvas)
 
 const gl = canvas.getContext("webgl")
@@ -75,6 +72,21 @@ const render = () => {
         //     height: Math.ceil(window.innerHeight / 2)
         // }
         // console.log(framebufferDimensions)
+        const canvasSize = window.innerWidth / 2
+        canvas.setAttribute(
+            "style",
+            `
+            display: block;
+            width: ${canvasSize}px;
+            height: ${canvasSize}px;
+            margin: 0px;
+            padding: 0px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            `
+        )
 
         const byteFramebuffer = new Uint8Array(256 * 256)
         byteFramebuffer.forEach((_, i) => {
@@ -90,7 +102,7 @@ const render = () => {
             height: 256
         })
     })
-    // requestAnimationFrame(render)
+    requestAnimationFrame(render)
 }
 
 setInterval(() => console.log(renderTime), 10000)
