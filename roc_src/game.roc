@@ -4,4 +4,4 @@ app "game"
     provides [render] to pf
 
 render : List U8
-render = [1, 2, 3, 4]
+render = List.repeat 0 (120)

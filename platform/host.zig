@@ -2,8 +2,10 @@
 
 const std = @import("std");
 const str = @import("str");
+const list = @import("list");
 const builtin = @import("builtin");
 const RocStr = str.RocStr;
+const RocList = list.RocList;
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -34,17 +36,15 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
     _ = memcpy(dest, src, count);
 }
 
-// NOTE roc_panic is provided in the JS file, so it can throw an exception
-
 extern fn roc__mainForHost_1_exposed([*]u8) void;
 
 extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
 
 pub fn main() u8 {
-    var callResult: [256 * 256]u8 = undefined;
+    var callResult = RocList.empty();
     roc__mainForHost_1_exposed(&callResult);
 
-    js_render(&callResult, 256, 256);
+    js_render(callResult.elements[0..100], 10, 10);
 
     return 0;
 }
