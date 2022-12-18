@@ -1,9 +1,9 @@
 platform "echo-in-web-assembly"
-    requires {} { main : Str }
+    requires {} { render : List U8 }
     exposes []
     packages {}
     imports []
     provides [mainForHost]
 
-mainForHost : Str
-mainForHost = main
+mainForHost : List U8
+mainForHost = render

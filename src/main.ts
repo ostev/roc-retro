@@ -1,4 +1,4 @@
-import { retroInit } from "./host"
+import { getRenderer } from "./host"
 import { RenderEngine } from "./render/engine"
 // import { toRGBA } from "./render/framebuffer"
 import {
@@ -9,7 +9,7 @@ import {
 } from "./render/palette"
 import { benchmark } from "./benchmark"
 
-await retroInit("/game.wasm")
+;(await getRenderer("/game.wasm"))()
 
 class WebGLNotSupportedError extends Error {
     constructor(message: string) {

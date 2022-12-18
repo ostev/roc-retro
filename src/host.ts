@@ -46,10 +46,10 @@ function getWasmModule(
     }
 }
 
-export async function retroInit(path: string): Promise<RetroModule> {
+export async function getRenderer(path: string): Promise<() => void> {
     const decoder = new TextDecoder()
-    let memory_bytes: any
-    let exit_code
+    let memory_bytes: Uint8Array
+    let exit_code: number
 
     function displayRocString(str_bytes: any, str_len: any) {
         const utf8_bytes = memory_bytes.subarray(str_bytes, str_bytes + str_len)
@@ -77,7 +77,23 @@ export async function retroInit(path: string): Promise<RetroModule> {
                     `Remain calm! Do not panic! Roc panicked!`
                 )
             },
-            js_display_roc_string: displayRocString
+            js_render: (framebuffer: any, width: number, height: number) => {
+                const bytes = memory_bytes.subarray(
+                    framebuffer,
+                    framebuffer + 256 * 256
+                )
+
+                // for (let i = 0; i < width * height; i++) {
+                //     if (bytes[i] !== 0) {
+                //         console.log("Alert!")
+                //     }
+                // }
+
+                console.log("Roc framebuffer: ", bytes)
+                console.log(typeof framebuffer)
+                console.log(width)
+                console.log(height)
+            }
         }
     }
 
@@ -87,17 +103,15 @@ export async function retroInit(path: string): Promise<RetroModule> {
         (module.instance.exports.memory as any).buffer
     )
 
-    try {
-        ;(module.instance.exports as any)._start()
-    } catch (e: any) {
-        const is_ok = e.message == "unreachable" && exit_code == 0
+    return () => {
+        try {
+            ;(module.instance.exports as any)._start()
+        } catch (e: any) {
+            const is_ok = e.message == "unreachable" && exit_code == 0
 
-        if (!is_ok) {
-            throw new RocWasmInstanceStartError(e)
+            if (!is_ok) {
+                throw new RocWasmInstanceStartError(e)
+            }
         }
-    }
-
-    return {
-        rocInstance: module.instance
     }
 }

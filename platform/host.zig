@@ -1,8 +1,9 @@
-// Taken from: https://github.com/roc-lang/roc/blob/main/examples/platform-switching/web-assembly-platform/host.zig
+// This ia a modified version of https://github.com/roc-lang/roc/blob/main/examples/platform-switching/web-assembly-platform/host.zig
+
+const std = @import("std");
 const str = @import("str");
 const builtin = @import("builtin");
 const RocStr = str.RocStr;
-
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -35,21 +36,15 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
 
 // NOTE roc_panic is provided in the JS file, so it can throw an exception
 
-extern fn roc__mainForHost_1_exposed(*RocStr) void;
+extern fn roc__mainForHost_1_exposed([*]u8) void;
 
-extern fn js_display_roc_string(str_bytes: ?[*]u8, str_len: usize) void;
-
-extern fn render(framebuffer: [*]u8, width: usize, height: usize) void;
+extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
 
 pub fn main() u8 {
-    // actually call roc to populate the callresult
-    var callresult = RocStr.empty();
-    roc__mainForHost_1_exposed(&callresult);
+    var callResult: [256 * 256]u8 = undefined;
+    roc__mainForHost_1_exposed(&callResult);
 
-    // display the result using JavaScript
-    js_display_roc_string(callresult.asU8ptr(), callresult.len());
-
-    callresult.deinit();
+    js_render(&callResult, 256, 256);
 
     return 0;
 }

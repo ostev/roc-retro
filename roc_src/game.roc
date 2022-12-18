@@ -1,6 +1,7 @@
 app "game"
     packages { pf: "../platform/main.roc" }
     imports []
-    provides [main] to pf
+    provides [render] to pf
 
-main = "Roc <3 Web Assembly!\n"
+render : List U8
+render = [1, 2, 3, 4]
