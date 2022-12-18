@@ -2,10 +2,8 @@
 
 const std = @import("std");
 const str = @import("str");
-const list = @import("list");
 const builtin = @import("builtin");
 const RocStr = str.RocStr;
-const RocList = list.RocList;
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -36,15 +34,30 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
     _ = memcpy(dest, src, count);
 }
 
-extern fn roc__mainForHost_1_exposed([*]u8) void;
+extern fn roc__mainForHost_1_exposed() RocList;
 
 extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
 
-pub fn main() u8 {
-    var callResult = RocList.empty();
-    roc__mainForHost_1_exposed(&callResult);
+const RocList = extern struct { elements: [*]u8, length: usize, capacity: usize };
 
-    js_render(callResult.elements[0..100], 10, 10);
+pub fn main() u8 {
+    // var callResult = RocList.empty();
+    // var raw_numbers: [NUM_NUMS + 1]i64 = undefined;
+
+    // set refcount to one
+    // raw_numbers[0] = -9223372036854775808;
+
+    // var numbers = raw_numbers[1..];
+
+    // for (numbers) |_, i| {
+    //     numbers[i] = @mod(@intCast(i64, i), 12);
+    // }
+
+    // var roc_list = RocList{ .elements = numbers, .length = NUM_NUMS, .capacity = NUM_NUMS };
+
+    var output = roc__mainForHost_1_exposed();
+
+    js_render(output.elements, 256, 224);
 
     return 0;
 }

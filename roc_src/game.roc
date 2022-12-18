@@ -1,7 +1,7 @@
 app "game"
     packages { pf: "../platform/main.roc" }
     imports []
-    provides [render] to pf
+    provides [main] to pf
 
-render : List U8
-render = List.repeat 0 (120)
+main : List U8
+main = List.repeat 5 (256 * 224)

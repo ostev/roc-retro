@@ -77,10 +77,10 @@ export async function getRenderer(path: string): Promise<() => void> {
                     `Remain calm! Do not panic! Roc panicked!`
                 )
             },
-            js_render: (framebuffer: any, width: number, height: number) => {
+            js_render: (framebuffer: number, width: number, height: number) => {
                 const bytes = memory_bytes.subarray(
                     framebuffer,
-                    framebuffer + 256 * 256
+                    framebuffer + width * height
                 )
 
                 // for (let i = 0; i < width * height; i++) {
@@ -90,7 +90,7 @@ export async function getRenderer(path: string): Promise<() => void> {
                 // }
 
                 console.log("Roc framebuffer: ", bytes)
-                console.log(typeof framebuffer)
+                console.log(framebuffer)
                 console.log(width)
                 console.log(height)
             }
