@@ -1,8 +1,9 @@
 platform "echo-in-web-assembly"
-    requires {} { main: List U8 }
+    requires {} { main: Task {} [] }
     exposes []
     packages {}
-    imports []
-    provides [mainForHost]
+    imports [ Task.{ Task } ]
+    provides [ mainForHost ]
 
+mainForHost : Task {} [] as Fx
 mainForHost = main

@@ -1,7 +1,7 @@
 app "game"
     packages { pf: "../platform/main.roc" }
-    imports []
-    provides [main] to pf
+    imports [ pf.Task.{ Task } ]
+    provides [ main ] to pf
 
-main : List U8
-main = List.repeat 5 (256 * 224)
+main : Task {} []
+main = Task.render { width: 2, height: 2, pixels: [1, 2, 3, 4]}

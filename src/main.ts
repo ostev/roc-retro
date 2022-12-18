@@ -9,7 +9,8 @@ import {
 } from "./render/palette"
 import { benchmark } from "./benchmark"
 
-;(await getRenderer("/game.wasm"))()
+const rocRender = await getRenderer("/game.wasm")
+rocRender()
 
 class WebGLNotSupportedError extends Error {
     constructor(message: string) {

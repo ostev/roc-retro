@@ -34,11 +34,16 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
     _ = memcpy(dest, src, count);
 }
 
-extern fn roc__mainForHost_1_exposed() RocList;
+extern fn roc__mainForHost_1_exposed(i32) void;
 
 extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
 
 const RocList = extern struct { elements: [*]u8, length: usize, capacity: usize };
+
+pub export fn roc_fx_render(pixels: *RocList) callconv(.C) void {
+    // js_render(pixels.elements, @intToFloat(f64, width), @intToFloat(f64, height));
+    js_render(pixels.elements, 2, 2);
+}
 
 pub fn main() u8 {
     // var callResult = RocList.empty();
@@ -55,9 +60,10 @@ pub fn main() u8 {
 
     // var roc_list = RocList{ .elements = numbers, .length = NUM_NUMS, .capacity = NUM_NUMS };
 
-    var output = roc__mainForHost_1_exposed();
+    roc__mainForHost_1_exposed(0);
+    // roc__mainForHost_1_exposed_generic(0);
 
-    js_render(output.elements, 256, 224);
+    // js_render(output.elements, 256, 224);
 
     return 0;
 }
