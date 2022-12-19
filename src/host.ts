@@ -100,11 +100,11 @@ export async function getRenderer(path: string): Promise<() => void> {
                     }
                 }
 
-                console.log(
-                    new Uint8Array(
-                        (module.instance.exports.memory as any)
-                            .buffer as ArrayBuffer
-                    ).subarray()
+                const buffer = (module.instance.exports.memory as any)
+                    .buffer as ArrayBuffer
+                const framebuffer = new Uint8Array(buffer).subarray(
+                    framebufferPointer,
+                    framebufferPointer + framebufferLength
                 )
 
                 // for (let i = 0; i < width * height; i++) {
@@ -113,8 +113,7 @@ export async function getRenderer(path: string): Promise<() => void> {
                 //     }
                 // }
 
-                // console.log("Roc framebuffer: ", bytes)
-                console.log(framebufferPointer)
+                console.log("Roc framebuffer: ", framebuffer)
                 console.log(width)
                 console.log(height)
             }
