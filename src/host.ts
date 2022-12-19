@@ -1,32 +1,41 @@
-export class RocExitError extends Error {
+self.onmessage = (msg: MessageEvent<string>) => {
+    if (msg.data[0] === "start") {
+        console.log("Host worker starting Roc runtime...")
+        ;(async () => await start(msg.data[1]))()
+    } else {
+        console.log("Host worker received unknown message:", msg)
+    }
+}
+
+class RocExitError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "RocExitError"
     }
 }
 
-export class FdWriteNotSupportedErrror extends Error {
+class FdWriteNotSupportedError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "FdWriteNotSupportedError"
     }
 }
 
-export class RocPanicError extends Error {
+class RocPanicError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "RocPanicError"
     }
 }
 
-export class RocWasmInstanceStartError extends Error {
+class RocWasmInstanceStartError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "RocWasmInstanceStartError"
     }
 }
 
-export class FramebufferBoundsError extends Error {
+class FramebufferBoundsError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "FramebufferBoundsError"
@@ -49,10 +58,10 @@ function getWasmInstance(
     }
 }
 
-export async function getRenderer(path: string): Promise<() => void> {
-    const decoder = new TextDecoder()
+async function start(path: string) {
     let exit_code: number
     let instance: WebAssembly.WebAssemblyInstantiatedSource
+    console.log("Starting...")
 
     const importObj = {
         wasi_snapshot_preview1: {
@@ -63,7 +72,7 @@ export async function getRenderer(path: string): Promise<() => void> {
                 exit_code = code
             },
             fd_write: (x: unknown) => {
-                throw new FdWriteNotSupportedErrror(
+                throw new FdWriteNotSupportedError(
                     `fd_write not supported: ${x}`
                 )
             }
@@ -96,11 +105,13 @@ export async function getRenderer(path: string): Promise<() => void> {
                     }
                 }
 
-                const buffer = (instance.instance.exports.memory as any)
+                const memoryBuffer = (instance.instance.exports.memory as any)
                     .buffer as ArrayBuffer
-                const framebuffer = new Uint8Array(buffer).subarray(
-                    framebufferPointer,
-                    framebufferPointer + framebufferLength
+                const framebuffer = new Uint8Array(
+                    memoryBuffer.slice(
+                        framebufferPointer,
+                        framebufferPointer + framebufferLength
+                    )
                 )
 
                 // for (let i = 0; i < width * height; i++) {
@@ -110,23 +121,22 @@ export async function getRenderer(path: string): Promise<() => void> {
                 // }
 
                 console.log("Roc framebuffer: ", framebuffer)
-                console.log(width)
-                console.log(height)
+
+                self.postMessage(["render", framebuffer.buffer])
             }
         }
     }
 
     instance = await getWasmInstance(path, importObj)
+    console.log("Have instance")
 
-    return () => {
-        try {
-            ;(instance.instance.exports as any)._start()
-        } catch (e: any) {
-            const is_ok = e.message == "unreachable" && exit_code == 0
+    try {
+        ;(instance.instance.exports as any)._start()
+    } catch (e: any) {
+        const is_ok = e.message == "unreachable" && exit_code == 0
 
-            if (!is_ok) {
-                throw new RocWasmInstanceStartError(e)
-            }
+        if (!is_ok) {
+            throw new RocWasmInstanceStartError(e)
         }
     }
 }

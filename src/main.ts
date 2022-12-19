@@ -1,4 +1,3 @@
-import { getRenderer } from "./host"
 import { RenderEngine } from "./render/engine"
 // import { toRGBA } from "./render/framebuffer"
 import {
@@ -8,10 +7,20 @@ import {
     paletteToVec3Array
 } from "./render/palette"
 import { benchmark } from "./benchmark"
+import hostUrl from "./host?url"
 
-const rocRender = await getRenderer("/game.wasm")
+const host = new Worker(hostUrl)
+host.onerror = (e) => {
+    console.error(e)
+}
 
-console.log(`Time to initialise Roc runtime: ${benchmark(rocRender)}ms`)
+host.onmessage = (msg) => {
+    if (msg.data[0] == "render") {
+        console.log(new Uint8Array(msg.data[1]))
+    }
+}
+
+host.postMessage(["start", "/game.wasm"])
 
 class WebGLNotSupportedError extends Error {
     constructor(message: string) {
