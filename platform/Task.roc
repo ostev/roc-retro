@@ -36,14 +36,14 @@ map = \effect, f ->
                 Ok val -> Ok (f val)
                 Err err -> Err err
 
-Framebuffer : { width : U32, height : U32, pixels : List U8 }
+Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
 
 render : Framebuffer -> Task {} *
 render = \framebuffer  ->
     Effect.map
         ( Effect.render
             framebuffer.pixels
-            # framebuffer.width
-            # framebuffer.height
+            framebuffer.width
+            framebuffer.height
         )
         (\_ -> Ok {})

@@ -30,6 +30,13 @@ export class RocWasmInstanceStartError extends Error {
     }
 }
 
+export class FramebufferBoundsError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = "FramebufferBoundsError"
+    }
+}
+
 function getWasmModule(
     path: string,
     importObj: WebAssembly.Imports
@@ -48,8 +55,8 @@ function getWasmModule(
 
 export async function getRenderer(path: string): Promise<() => void> {
     const decoder = new TextDecoder()
-    // let memory_bytes: Uint8Array
     let exit_code: number
+    let module: WebAssembly.WebAssemblyInstantiatedSource
 
     const importObj = {
         wasi_snapshot_preview1: {
@@ -71,11 +78,34 @@ export async function getRenderer(path: string): Promise<() => void> {
                     `Remain calm! Do not panic! Roc panicked!`
                 )
             },
-            js_render: (framebuffer: number, width: number, height: number) => {
-                // const bytes = memory_bytes.subarray(
-                //     framebuffer,
-                //     framebuffer + width * height
-                // )
+            js_render: (
+                framebufferPointer: number,
+                framebufferLength: number,
+                width: number,
+                height: number
+            ) => {
+                if (framebufferLength !== width * height) {
+                    if (framebufferLength > width * height) {
+                        throw new FramebufferBoundsError(
+                            `Frame buffer length (${framebufferLength}) is greater than its width and height dictates: ${width} * ${height} = ${
+                                width * height
+                            }.`
+                        )
+                    } else {
+                        throw new FramebufferBoundsError(
+                            `Frame buffer length (${framebufferLength}) is less than its width and height dictates: ${width} * ${height} = ${
+                                width * height
+                            }.`
+                        )
+                    }
+                }
+
+                console.log(
+                    new Uint8Array(
+                        (module.instance.exports.memory as any)
+                            .buffer as ArrayBuffer
+                    ).subarray()
+                )
 
                 // for (let i = 0; i < width * height; i++) {
                 //     if (bytes[i] !== 0) {
@@ -84,18 +114,14 @@ export async function getRenderer(path: string): Promise<() => void> {
                 // }
 
                 // console.log("Roc framebuffer: ", bytes)
-                console.log(framebuffer)
+                console.log(framebufferPointer)
                 console.log(width)
                 console.log(height)
             }
         }
     }
 
-    const module = await getWasmModule(path, importObj)
-
-    // memory_bytes = new Uint8Array(
-    //     (module.instance.exports.memory as any).buffer
-    // )
+    module = await getWasmModule(path, importObj)
 
     return () => {
         try {

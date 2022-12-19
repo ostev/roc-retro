@@ -14,4 +14,4 @@ hosted Effect
         , forever
         , loop]
 
-render : List U8 -> Effect {}
+render : List U8, Nat, Nat -> Effect {}
