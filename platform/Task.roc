@@ -37,13 +37,15 @@ map = \effect, f ->
                 Err err -> Err err
 
 Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
+Palette : List U32
 
-render : Framebuffer -> Task {} *
-render = \framebuffer  ->
+render : Framebuffer, Palette -> Task {} *
+render = \framebuffer, palette  ->
     Effect.map
         ( Effect.render
             framebuffer.pixels
             framebuffer.width
             framebuffer.height
+            palette
         )
         (\_ -> Ok {})

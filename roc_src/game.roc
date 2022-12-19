@@ -4,4 +4,5 @@ app "game"
     provides [ main ] to pf
 
 main : Task {} []
-main = Task.render { width: 256, height: 256, pixels: List.repeat 3 (256 * 256)}
+main = Task.render { width: 256, height: 256, pixels: List.repeat 3 (256 * 256)} 
+    (List.repeat (0xFF000000) 16)

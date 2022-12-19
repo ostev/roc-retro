@@ -5,7 +5,8 @@ const str = @import("str");
 const builtin = @import("builtin");
 const RocStr = str.RocStr;
 
-const RocList = extern struct { elements: [*]u8, length: usize, capacity: usize };
+const RocListU8 = extern struct { elements: [*]u8, length: usize, capacity: usize };
+const RocListU32 = extern struct { elements: [*]u32, length: usize, capacity: usize };
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -21,7 +22,13 @@ extern fn roc__mainForHost_1__Fx_size() i64;
 extern fn roc__mainForHost_1__Fx_result_size() i64;
 
 // JS exports
-extern fn js_render(framebuffer: [*]u8, framebufferLength: usize, width: usize, height: usize) void;
+extern fn js_render(
+    framebuffer: [*]u8,
+    framebufferLength: usize,
+    width: usize,
+    height: usize,
+    palette: [*]u32,
+) void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -46,17 +53,17 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
     _ = memcpy(dest, src, count);
 }
 
-pub export fn roc_fx_render(pixels: *RocList, width: usize, height: usize) callconv(.C) void {
+pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, palette: *RocListU32) callconv(.C) void {
     // js_render(pixels.elements, @intToFloat(f64, width), @intToFloat(f64, height));
 
-    js_render(pixels.elements, pixels.length, width, height);
+    js_render(pixels.elements, pixels.length, width, height, palette.elements);
 }
 
 pub fn main() u8 {
     // var starting_memory = malloc(100 * 1000 * 1024);
     // defer free(@alignCast(@alignOf(Align), @ptrCast([*]u8, starting_memory)));
 
-    // var callResult = RocList.empty();
+    // var callResult = RocListU8.empty();
     // var raw_numbers: [NUM_NUMS + 1]i64 = undefined;
 
     // set refcount to one
@@ -68,7 +75,7 @@ pub fn main() u8 {
     //     numbers[i] = @mod(@intCast(i64, i), 12);
     // }
 
-    // var roc_list = RocList{ .elements = numbers, .length = NUM_NUMS, .capacity = NUM_NUMS };
+    // var roc_list = RocListU8{ .elements = numbers, .length = NUM_NUMS, .capacity = NUM_NUMS };
 
     // js_render(output.elements, 256, 224);
 
