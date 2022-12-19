@@ -35,9 +35,15 @@ export class Engine {
             this.host.onmessage = (msg) => {
                 if (msg.data[0] == "render") {
                     const framebuffer = new Uint8Array(msg.data[1])
-                    console.log(`Render requested of:`, framebuffer)
+                    const palette = new Uint32Array(msg.data[4])
+                    console.log(
+                        `Render requested of:`,
+                        framebuffer,
+                        "with palette",
+                        palette
+                    )
 
-                    this.renderEngine.render(framebuffer, new Uint32Array(16), {
+                    this.renderEngine.render(framebuffer, palette, {
                         width: msg.data[2] as number,
                         height: msg.data[3] as number
                     })

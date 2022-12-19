@@ -87,7 +87,8 @@ async function start(path: string) {
                 framebufferPointer: number,
                 framebufferLength: number,
                 width: number,
-                height: number
+                height: number,
+                palettePointer: number
             ) => {
                 if (framebufferLength !== width * height) {
                     if (framebufferLength > width * height) {
@@ -107,11 +108,14 @@ async function start(path: string) {
 
                 const memoryBuffer = (instance.instance.exports.memory as any)
                     .buffer as ArrayBuffer
-                const framebuffer = new Uint8Array(
-                    memoryBuffer.slice(
-                        framebufferPointer,
-                        framebufferPointer + framebufferLength
-                    )
+
+                const palette = memoryBuffer.slice(
+                    palettePointer,
+                    palettePointer + 16 * 4
+                )
+                const framebuffer = memoryBuffer.slice(
+                    framebufferPointer,
+                    framebufferPointer + framebufferLength
                 )
 
                 // for (let i = 0; i < width * height; i++) {
@@ -120,9 +124,16 @@ async function start(path: string) {
                 //     }
                 // }
 
-                console.log("Roc framebuffer: ", framebuffer)
+                console.log("Roc framebuffer:", framebuffer)
+                console.log("Roc palette:", palette)
 
-                self.postMessage(["render", framebuffer.buffer, width, height])
+                self.postMessage([
+                    "render",
+                    framebuffer,
+                    width,
+                    height,
+                    palette
+                ])
             }
         }
     }
