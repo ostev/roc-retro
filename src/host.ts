@@ -1,7 +1,3 @@
-export interface RetroModule {
-    rocInstance: WebAssembly.Instance
-}
-
 export class RocExitError extends Error {
     constructor(message: string) {
         super(message)
@@ -37,7 +33,7 @@ export class FramebufferBoundsError extends Error {
     }
 }
 
-function getWasmModule(
+function getWasmInstance(
     path: string,
     importObj: WebAssembly.Imports
 ): Promise<WebAssembly.WebAssemblyInstantiatedSource> {
@@ -56,7 +52,7 @@ function getWasmModule(
 export async function getRenderer(path: string): Promise<() => void> {
     const decoder = new TextDecoder()
     let exit_code: number
-    let module: WebAssembly.WebAssemblyInstantiatedSource
+    let instance: WebAssembly.WebAssemblyInstantiatedSource
 
     const importObj = {
         wasi_snapshot_preview1: {
@@ -100,7 +96,7 @@ export async function getRenderer(path: string): Promise<() => void> {
                     }
                 }
 
-                const buffer = (module.instance.exports.memory as any)
+                const buffer = (instance.instance.exports.memory as any)
                     .buffer as ArrayBuffer
                 const framebuffer = new Uint8Array(buffer).subarray(
                     framebufferPointer,
@@ -120,11 +116,11 @@ export async function getRenderer(path: string): Promise<() => void> {
         }
     }
 
-    module = await getWasmModule(path, importObj)
+    instance = await getWasmInstance(path, importObj)
 
     return () => {
         try {
-            ;(module.instance.exports as any)._start()
+            ;(instance.instance.exports as any)._start()
         } catch (e: any) {
             const is_ok = e.message == "unreachable" && exit_code == 0
 
