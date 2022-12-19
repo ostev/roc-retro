@@ -48,14 +48,8 @@ function getWasmModule(
 
 export async function getRenderer(path: string): Promise<() => void> {
     const decoder = new TextDecoder()
-    let memory_bytes: Uint8Array
+    // let memory_bytes: Uint8Array
     let exit_code: number
-
-    function displayRocString(str_bytes: any, str_len: any) {
-        const utf8_bytes = memory_bytes.subarray(str_bytes, str_bytes + str_len)
-        const js_string = decoder.decode(utf8_bytes)
-        console.log(js_string)
-    }
 
     const importObj = {
         wasi_snapshot_preview1: {
@@ -78,10 +72,10 @@ export async function getRenderer(path: string): Promise<() => void> {
                 )
             },
             js_render: (framebuffer: number, width: number, height: number) => {
-                const bytes = memory_bytes.subarray(
-                    framebuffer,
-                    framebuffer + width * height
-                )
+                // const bytes = memory_bytes.subarray(
+                //     framebuffer,
+                //     framebuffer + width * height
+                // )
 
                 // for (let i = 0; i < width * height; i++) {
                 //     if (bytes[i] !== 0) {
@@ -89,7 +83,7 @@ export async function getRenderer(path: string): Promise<() => void> {
                 //     }
                 // }
 
-                console.log("Roc framebuffer: ", bytes)
+                // console.log("Roc framebuffer: ", bytes)
                 console.log(framebuffer)
                 console.log(width)
                 console.log(height)
@@ -99,9 +93,9 @@ export async function getRenderer(path: string): Promise<() => void> {
 
     const module = await getWasmModule(path, importObj)
 
-    memory_bytes = new Uint8Array(
-        (module.instance.exports.memory as any).buffer
-    )
+    // memory_bytes = new Uint8Array(
+    //     (module.instance.exports.memory as any).buffer
+    // )
 
     return () => {
         try {

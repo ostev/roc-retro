@@ -11,6 +11,16 @@ extern fn realloc(c_ptr: [*]align(@alignOf(Align)) u8, size: usize) callconv(.C)
 extern fn free(c_ptr: [*]align(@alignOf(Align)) u8) callconv(.C) void;
 extern fn memcpy(dest: *anyopaque, src: *anyopaque, count: usize) *anyopaque;
 
+// Roc exports
+extern fn roc__mainForHost_1_exposed_generic([*]u8) void;
+extern fn roc__mainForHost_size() i64;
+extern fn roc__mainForHost_1__Fx_caller(*const u8, [*]u8, [*]u8) void;
+extern fn roc__mainForHost_1__Fx_size() i64;
+extern fn roc__mainForHost_1__Fx_result_size() i64;
+
+// JS exports
+extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
+
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
 
@@ -34,10 +44,6 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
     _ = memcpy(dest, src, count);
 }
 
-extern fn roc__mainForHost_1_exposed(i32) void;
-
-extern fn js_render(framebuffer: [*]u8, width: f64, height: f64) void;
-
 const RocList = extern struct { elements: [*]u8, length: usize, capacity: usize };
 
 pub export fn roc_fx_render(pixels: *RocList) callconv(.C) void {
@@ -60,10 +66,54 @@ pub fn main() u8 {
 
     // var roc_list = RocList{ .elements = numbers, .length = NUM_NUMS, .capacity = NUM_NUMS };
 
-    roc__mainForHost_1_exposed(0);
-    // roc__mainForHost_1_exposed_generic(0);
-
     // js_render(output.elements, 256, 224);
 
+    const allocator = std.heap.page_allocator;
+
+    // NOTE that the roc__mainForHost_size() can be 0, which would cause a segfault.
+    // To deal with this, we always allocate at least 8 bytes.
+    const size = std.math.max(8, @intCast(usize, roc__mainForHost_size()));
+    const raw_output = allocator.allocAdvanced(u8, @alignOf(u64), @intCast(usize, size), .at_least) catch unreachable;
+    var output = @ptrCast([*]u8, raw_output);
+
+    defer {
+        allocator.free(raw_output);
+    }
+
+    roc__mainForHost_1_exposed_generic(output);
+
+    call_roc_closure(output);
+
     return 0;
+}
+
+fn call_roc_closure(closure_data_pointer: [*]u8) void {
+    const allocator = std.heap.page_allocator;
+
+    const size = roc__mainForHost_1__Fx_result_size();
+
+    if (size == 0) {
+        // The closure returns an empty record
+        // If we attempted to allocate 0 bytes, we would get a segfault
+        // since the allocator will return a NULL pointer, so we implement
+        // some custom logic in this case.
+
+        const flags: u8 = 0;
+        var result: [1]u8 = .{0};
+        roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, &result);
+
+        return;
+    }
+
+    const raw_output = allocator.allocAdvanced(u8, @alignOf(u64), @intCast(usize, size), .at_least) catch unreachable;
+    var output = @ptrCast([*]u8, raw_output);
+
+    defer {
+        allocator.free(raw_output);
+    }
+
+    const flags: u8 = 0;
+    roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, output);
+
+    return;
 }
