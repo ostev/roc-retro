@@ -52,6 +52,9 @@ pub export fn roc_fx_render(pixels: *RocList) callconv(.C) void {
 }
 
 pub fn main() u8 {
+    // var starting_memory = malloc(100 * 1000 * 1024);
+    // defer free(@alignCast(@alignOf(Align), @ptrCast([*]u8, starting_memory)));
+
     // var callResult = RocList.empty();
     // var raw_numbers: [NUM_NUMS + 1]i64 = undefined;
 
@@ -94,7 +97,7 @@ fn call_roc_closure(closure_data_pointer: [*]u8) void {
 
     if (size == 0) {
         // The closure returns an empty record
-        // If we attempted to allocate 0 bytes, we would get a segfault
+        // If we attempted to allocate 0 bytes, the program would crash
         // since the allocator will return a NULL pointer, so we implement
         // some custom logic in this case.
 
