@@ -122,7 +122,7 @@ async function start(path: string) {
 
                 console.log("Roc framebuffer: ", framebuffer)
 
-                self.postMessage(["render", framebuffer.buffer])
+                self.postMessage(["render", framebuffer.buffer, width, height])
             }
         }
     }

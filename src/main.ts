@@ -8,26 +8,7 @@ import {
 } from "./render/palette"
 import { benchmark } from "./benchmark"
 import hostUrl from "./host?url"
-
-const host = new Worker(hostUrl)
-host.onerror = (e) => {
-    console.error(e)
-}
-
-host.onmessage = (msg) => {
-    if (msg.data[0] == "render") {
-        console.log(new Uint8Array(msg.data[1]))
-    }
-}
-
-host.postMessage(["start", "/game.wasm"])
-
-class WebGLNotSupportedError extends Error {
-    constructor(message: string) {
-        super(message)
-        this.name = "WebGLNotSupportedError"
-    }
-}
+import { Engine } from "./engine"
 
 // Draw a basic scene
 const canvas = document.createElement("canvas")
@@ -36,86 +17,86 @@ canvas.width = 256
 canvas.height = 256
 document.body.appendChild(canvas)
 
-const gl = canvas.getContext("webgl")
-if (gl === null) {
-    throw new WebGLNotSupportedError("WebGL is not supported")
-}
+const engine = new Engine(canvas)
+engine.start("/game.wasm")
 
-gl.getExtension("OES_texture_float")
+// const gl = canvas.getContext("webgl")
 
-const framebuffer = new Uint8Array((256 * 256) / 2)
-for (let i = 0; i < framebuffer.length; i++) {
-    framebuffer[i] = 0x33
-}
-const palette = new Uint32Array([
-    0x00ffff00, 0xff005f00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x5f209000,
-    0x00000000, 0x00000000
-])
-console.log("Palette: ", palette)
-console.log("Palette as texture data: ", paletteToTextureData(palette))
-console.log("Palette as vec3 array ", paletteToVec3Array(palette))
-console.log("Nibble framebuffer: ", framebuffer)
-// console.log(toRGBA(palette, framebuffer))
-console.log((framebuffer[0] & 0x0f) << 4)
+// gl.getExtension("OES_texture_float")
 
-// console.log(
-//     `toRGBA execution time: ${benchmark(() => toRGBA(palette, framebuffer))}`
-// )
+// const framebuffer = new Uint8Array((256 * 256) / 2)
+// for (let i = 0; i < framebuffer.length; i++) {
+//     framebuffer[i] = 0x33
+// }
+// const palette = new Uint32Array([
+//     0x00ffff00, 0xff005f00, 0xffffff00, 0xff000000, 0x00ff0f00, 0x5f209000,
+//     0x00000000, 0x00000000
+// ])
+// console.log("Palette: ", palette)
+// console.log("Palette as texture data: ", paletteToTextureData(palette))
+// console.log("Palette as vec3 array ", paletteToVec3Array(palette))
+// console.log("Nibble framebuffer: ", framebuffer)
+// // console.log(toRGBA(palette, framebuffer))
+// console.log((framebuffer[0] & 0x0f) << 4)
 
-// console.log("Byte framebuffer: ", byteFramebuffer)
+// // console.log(
+// //     `toRGBA execution time: ${benchmark(() => toRGBA(palette, framebuffer))}`
+// // )
 
-const floatFramebuffer = new Float32Array(256 * 256)
-floatFramebuffer.forEach((float, i) => {
-    floatFramebuffer[i] = 1
-})
+// // console.log("Byte framebuffer: ", byteFramebuffer)
 
-console.log("Float framebuffer: ", floatFramebuffer)
-console.log("Float lookup table: ", floatLookup)
+// const floatFramebuffer = new Float32Array(256 * 256)
+// floatFramebuffer.forEach((float, i) => {
+//     floatFramebuffer[i] = 1
+// })
 
-const renderEngine = new RenderEngine(gl)
+// console.log("Float framebuffer: ", floatFramebuffer)
+// console.log("Float lookup table: ", floatLookup)
 
-let renderTime = 0
+// const renderEngine = new RenderEngine(gl)
 
-const render = () => {
-    renderTime = benchmark(() => {
-        // const framebufferDimensions = {
-        //     width: Math.ceil(window.innerWidth / 2),
-        //     height: Math.ceil(window.innerHeight / 2)
-        // }
-        // console.log(framebufferDimensions)
-        const canvasSize = window.innerWidth / 2
-        canvas.setAttribute(
-            "style",
-            `
-            display: block;
-            width: ${canvasSize}px;
-            height: ${canvasSize}px;
-            margin: 0px;
-            padding: 0px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            `
-        )
+// let renderTime = 0
 
-        const byteFramebuffer = new Uint8Array(256 * 256)
-        byteFramebuffer.forEach((_, i) => {
-            if (i % 256 < 128) {
-                byteFramebuffer[i] = 1
-            } else {
-                byteFramebuffer[i] = 0
-            }
-        })
-        // byteFramebuffer[0] = 1
-        renderEngine.render(byteFramebuffer, palette, {
-            width: 256,
-            height: 256
-        })
-    })
-    requestAnimationFrame(render)
-}
+// const render = () => {
+//     renderTime = benchmark(() => {
+//         // const framebufferDimensions = {
+//         //     width: Math.ceil(window.innerWidth / 2),
+//         //     height: Math.ceil(window.innerHeight / 2)
+//         // }
+//         // console.log(framebufferDimensions)
+//         const canvasSize = window.innerWidth / 2
+//         canvas.setAttribute(
+//             "style",
+//             `
+//             display: block;
+//             width: ${canvasSize}px;
+//             height: ${canvasSize}px;
+//             margin: 0px;
+//             padding: 0px;
+//             position: absolute;
+//             top: 50%;
+//             left: 50%;
+//             transform: translate(-50%, -50%);
+//             `
+//         )
 
-setInterval(() => console.log(renderTime), 10000)
+//         const byteFramebuffer = new Uint8Array(256 * 256)
+//         byteFramebuffer.forEach((_, i) => {
+//             if (i % 256 < 128) {
+//                 byteFramebuffer[i] = 1
+//             } else {
+//                 byteFramebuffer[i] = 0
+//             }
+//         })
+//         // byteFramebuffer[0] = 1
+//         renderEngine.render(byteFramebuffer, palette, {
+//             width: 256,
+//             height: 256
+//         })
+//     })
+//     requestAnimationFrame(render)
+// }
 
-render()
+// setInterval(() => console.log(renderTime), 10000)
+
+// render()
