@@ -10,7 +10,8 @@ import {
 import { benchmark } from "./benchmark"
 
 const rocRender = await getRenderer("/game.wasm")
-rocRender()
+
+console.log(`Time to initialise Roc runtime: ${benchmark(rocRender)}ms`)
 
 class WebGLNotSupportedError extends Error {
     constructor(message: string) {
