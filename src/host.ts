@@ -63,6 +63,14 @@ async function start(path: string) {
     let instance: WebAssembly.WebAssemblyInstantiatedSource
     console.log("Starting...")
 
+    function requestRender(rocClosurePointer: number) {
+        ;(instance.instance.exports as any).call_roc_closure(rocClosurePointer)
+        requestAnimationFrame((delta) => {
+            ;(instance.instance.exports as any).set_frame_delta(delta)
+            requestRender(rocClosurePointer)
+        })
+    }
+
     const importObj = {
         wasi_snapshot_preview1: {
             proc_exit: (code: number) => {
@@ -83,6 +91,7 @@ async function start(path: string) {
                     `Remain calm! Do not panic! Roc panicked!`
                 )
             },
+            js_request_animation_frame: requestRender,
             js_render: (
                 framebufferPointer: number,
                 framebufferLength: number,
@@ -124,8 +133,8 @@ async function start(path: string) {
                 //     }
                 // }
 
-                console.log("Roc framebuffer:", framebuffer)
-                console.log("Roc palette:", palette)
+                // console.log("Roc framebuffer:", framebuffer)
+                // console.log("Roc palette:", palette)
 
                 self.postMessage([
                     "render",

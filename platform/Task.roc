@@ -5,18 +5,19 @@ interface Task
         , fail
         , after
         , map
-        , render ]
-    imports [ pf.Effect ]
+        , render
+        , getFrameDelta ]
+    imports [ pf.Effect.{ Effect } ]
 
-Task ok err : Effect.Effect (Result ok err)
+Task ok err : Effect (Result ok err)
 
 succeed : val -> Task val *
-succeed = \val ->
-    Effect.always (Ok val)
+succeed = \ok ->
+    Effect.always (Ok ok)
 
 fail : err -> Task * err
-fail = \val ->
-    Effect.always (Err val)
+fail = \err ->
+    Effect.always (Err err)
 
 after : Task a err, (a -> Task b err) -> Task b err
 after = \effect, f ->
@@ -39,6 +40,12 @@ map = \effect, f ->
 Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
 Palette : List U32
 
+# requestAnimationFrame : Task {} [] -> Task {} []
+# requestAnimationFrame = \task ->
+#     Effect.map
+#         ( Effect.requestAnimationFrame task )
+#         (\_ -> Ok {})
+
 render : Framebuffer, Palette -> Task {} *
 render = \framebuffer, palette  ->
     Effect.map
@@ -49,3 +56,6 @@ render = \framebuffer, palette  ->
             palette
         )
         (\_ -> Ok {})
+
+getFrameDelta : Task (Effect.Effect F64) []
+getFrameDelta = succeed Effect.getFrameDelta

@@ -29,6 +29,7 @@ extern fn js_render(
     height: usize,
     palette: [*]u32,
 ) void;
+extern fn js_request_animation_frame(closure_data_pointer: [*]u8) void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -57,6 +58,52 @@ pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, pal
     // js_render(pixels.elements, @intToFloat(f64, width), @intToFloat(f64, height));
 
     js_render(pixels.elements, pixels.length, width, height, palette.elements);
+}
+
+pub export fn roc_fx_requestAnimationFrame(closure_data_pointer: [*]u8) callconv(.C) void {
+    js_request_animation_frame(closure_data_pointer);
+}
+
+pub export fn roc_fx_getFrameDelta() callconv(.C) f64 {
+    return frame_delta;
+}
+
+pub export fn call_roc_closure(closure_data_pointer: [*]u8) void {
+    const allocator = std.heap.page_allocator;
+
+    const size = roc__mainForHost_1__Fx_result_size();
+
+    if (size == 0) {
+        // The closure returns an empty record
+        // If we attempted to allocate 0 bytes, the program would crash
+        // since the allocator will return a NULL pointer, so we implement
+        // some custom logic in this case.
+
+        const flags: u8 = 0;
+        var result: [1]u8 = .{0};
+        roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, &result);
+
+        return;
+    }
+
+    const raw_output = allocator.allocAdvanced(u8, @alignOf(u64), @intCast(usize, size), .at_least) catch unreachable;
+    var output = @ptrCast([*]u8, raw_output);
+
+    defer {
+        allocator.free(raw_output);
+    }
+
+    const flags: u8 = 0;
+    roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, output);
+
+    return;
+}
+
+// The difference in milliseconds between the current and previous frame
+var frame_delta: f64 = 0.0;
+
+pub export fn set_frame_delta(delta: f64) void {
+    frame_delta = delta;
 }
 
 pub fn main() u8 {
@@ -93,38 +140,9 @@ pub fn main() u8 {
 
     roc__mainForHost_1_exposed_generic(output);
 
-    call_roc_closure(output);
+    // call_roc_closure(output);
+
+    js_request_animation_frame(output);
 
     return 0;
-}
-
-fn call_roc_closure(closure_data_pointer: [*]u8) void {
-    const allocator = std.heap.page_allocator;
-
-    const size = roc__mainForHost_1__Fx_result_size();
-
-    if (size == 0) {
-        // The closure returns an empty record
-        // If we attempted to allocate 0 bytes, the program would crash
-        // since the allocator will return a NULL pointer, so we implement
-        // some custom logic in this case.
-
-        const flags: u8 = 0;
-        var result: [1]u8 = .{0};
-        roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, &result);
-
-        return;
-    }
-
-    const raw_output = allocator.allocAdvanced(u8, @alignOf(u64), @intCast(usize, size), .at_least) catch unreachable;
-    var output = @ptrCast([*]u8, raw_output);
-
-    defer {
-        allocator.free(raw_output);
-    }
-
-    const flags: u8 = 0;
-    roc__mainForHost_1__Fx_caller(&flags, closure_data_pointer, output);
-
-    return;
 }

@@ -36,19 +36,19 @@ export class Engine {
                 if (msg.data[0] == "render") {
                     const framebuffer = new Uint8Array(msg.data[1])
                     const palette = new Uint32Array(msg.data[4])
-                    console.log(
-                        `Render requested of:`,
-                        framebuffer,
-                        "with palette",
-                        palette
-                    )
+                    // console.log(
+                    //     `Render requested of:`,
+                    //     framebuffer,
+                    //     "with palette",
+                    //     palette
+                    // )
 
                     this.renderEngine.render(framebuffer, palette, {
                         width: msg.data[2] as number,
                         height: msg.data[3] as number
                     })
 
-                    console.log("Rendered.")
+                    // console.log("Rendered.")
                 }
             }
         }
