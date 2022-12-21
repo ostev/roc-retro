@@ -9,6 +9,7 @@ main =
     # getFrameDeltaAsInt = Task.getFrameDelta |> Task.map (\d -> Effect.map d Num.round)
 
     # frameDelta <- Task.await Task.getFrameDelta
+    _ <- Task.await Task.waitForAnimationFrame
 
     Task.render
         { width: 256, height: 256, pixels: List.repeat 3 (256 * 256)} 

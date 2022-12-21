@@ -33,7 +33,7 @@ export class Engine {
                 console.error(e)
             }
             this.host.onmessage = (msg) => {
-                if (msg.data[0] == "render") {
+                if (msg.data[0] === "render") {
                     const framebuffer = new Uint8Array(msg.data[1])
                     const palette = new Uint32Array(msg.data[4])
                     // console.log(
@@ -49,6 +49,15 @@ export class Engine {
                     })
 
                     // console.log("Rendered.")
+                } else if (msg.data[0] === "requestAnimationFrame") {
+                    requestAnimationFrame(() => {
+                        this.host.postMessage(["beginRender"])
+                    })
+                } else {
+                    console.log(
+                        "Engine received unknown message from host worker: ",
+                        msg
+                    )
                 }
             }
         }

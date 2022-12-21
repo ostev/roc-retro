@@ -1,7 +1,12 @@
+let instance: WebAssembly.WebAssemblyInstantiatedSource
+
 self.onmessage = (msg: MessageEvent<string>) => {
     if (msg.data[0] === "start") {
         console.log("Host worker starting Roc runtime...")
         ;(async () => await start(msg.data[1]))()
+    } else if (msg.data[0] === "beginRender") {
+        ;(instance.instance.exports as any).set_is_rendering(true)
+        console.log("Animation frame arrived")
     } else {
         console.log("Host worker received unknown message:", msg)
     }
@@ -59,16 +64,14 @@ function getWasmInstance(
 }
 
 async function start(path: string) {
-    let exit_code: number
-    let instance: WebAssembly.WebAssemblyInstantiatedSource
+    let exit_code: number | undefined = undefined
     console.log("Starting...")
 
-    function requestRender(rocClosurePointer: number) {
-        ;(instance.instance.exports as any).call_roc_closure(rocClosurePointer)
-        requestAnimationFrame((delta) => {
-            ;(instance.instance.exports as any).set_frame_delta(delta)
-            requestRender(rocClosurePointer)
-        })
+    function requestRender() {
+        console.log("Render requested")
+        const exports = instance.instance.exports as any
+        exports.set_is_rendering(false)
+        self.postMessage(["requestAnimationFrame"])
     }
 
     const importObj = {

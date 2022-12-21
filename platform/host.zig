@@ -14,6 +14,9 @@ extern fn realloc(c_ptr: [*]align(@alignOf(Align)) u8, size: usize) callconv(.C)
 extern fn free(c_ptr: [*]align(@alignOf(Align)) u8) callconv(.C) void;
 extern fn memcpy(dest: *anyopaque, src: *anyopaque, count: usize) *anyopaque;
 
+// State
+var is_rendering = false;
+
 // Roc exports
 extern fn roc__mainForHost_1_exposed_generic([*]u8) void;
 extern fn roc__mainForHost_size() i64;
@@ -29,7 +32,7 @@ extern fn js_render(
     height: usize,
     palette: [*]u32,
 ) void;
-extern fn js_request_animation_frame(closure_data_pointer: [*]u8) void;
+extern fn js_request_animation_frame() void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -56,16 +59,26 @@ export fn roc_memcpy(dest: *anyopaque, src: *anyopaque, count: usize) callconv(.
 
 pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, palette: *RocListU32) callconv(.C) void {
     // js_render(pixels.elements, @intToFloat(f64, width), @intToFloat(f64, height));
-
+    is_rendering = true;
     js_render(pixels.elements, pixels.length, width, height, palette.elements);
-}
-
-pub export fn roc_fx_requestAnimationFrame(closure_data_pointer: [*]u8) callconv(.C) void {
-    js_request_animation_frame(closure_data_pointer);
+    is_rendering = false;
 }
 
 pub export fn roc_fx_getFrameDelta() callconv(.C) f64 {
     return frame_delta;
+}
+
+pub export fn roc_fx_waitForAnimationFrame() callconv(.C) void {
+    if (is_rendering) {
+        return;
+    } else {
+        js_request_animation_frame();
+        while (!is_rendering) {}
+    }
+}
+
+pub export fn set_is_rendering(value: bool) void {
+    is_rendering = value;
 }
 
 pub export fn call_roc_closure(closure_data_pointer: [*]u8) void {
@@ -139,10 +152,7 @@ pub fn main() u8 {
     }
 
     roc__mainForHost_1_exposed_generic(output);
-
-    // call_roc_closure(output);
-
-    js_request_animation_frame(output);
+    call_roc_closure(output);
 
     return 0;
 }

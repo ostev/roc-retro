@@ -6,7 +6,8 @@ hosted Effect
             , forever
             , loop
             , render
-            , getFrameDelta ]
+            , getFrameDelta
+            , waitForAnimationFrame ]
     imports []
     generates Effect with
         [ after
@@ -18,3 +19,5 @@ hosted Effect
 render : List U8, Nat, Nat, List U32 -> Effect {}
 
 getFrameDelta : Effect F64
+
+waitForAnimationFrame : Effect {}

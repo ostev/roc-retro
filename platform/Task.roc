@@ -6,7 +6,8 @@ interface Task
         , await
         , map
         , render
-        , getFrameDelta ]
+        , getFrameDelta
+        , waitForAnimationFrame ]
     imports [ pf.Effect.{ Effect } ]
 
 Task ok err : Effect (Result ok err)
@@ -62,3 +63,7 @@ getFrameDelta =
     Effect.getFrameDelta
     |> Effect.map Ok
 
+waitForAnimationFrame : Task {} []
+waitForAnimationFrame =
+    Effect.waitForAnimationFrame
+    |> Effect.map Ok
