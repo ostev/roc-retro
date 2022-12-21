@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "build-roc": "rm platform/zig-cache -r && cd ~/roc && ./target/release/roc build ~/roc-retro/roc_src/game.roc --target=wasm32 && cd ~/roc-retro && mv roc_src/game.wasm public/game.wasm",
+        "build-roc": "rm platform/zig-cache -r; cd ~/roc && ./target/release/roc build ~/roc-retro/roc_src/game.roc --target=wasm32 && cd ~/roc-retro && mv roc_src/game.wasm public/game.wasm",
         "preview": "vite preview"
     },
     "devDependencies": {
