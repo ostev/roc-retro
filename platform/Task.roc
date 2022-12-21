@@ -61,3 +61,4 @@ getFrameDelta : Task F64 []
 getFrameDelta =
     Effect.getFrameDelta
     |> Effect.map Ok
+
