@@ -3,7 +3,7 @@ interface Task
         [ Task
         , succeed
         , fail
-        , after
+        , await
         , map
         , render
         , getFrameDelta ]
@@ -19,14 +19,14 @@ fail : err -> Task * err
 fail = \err ->
     Effect.always (Err err)
 
-after : Task a err, (a -> Task b err) -> Task b err
-after = \effect, f ->
+await : Task a err, (a -> Task b err) -> Task b err
+await = \task, f ->
     Effect.after
-        effect
+        task
         \result ->
             when result is
                 Ok val -> f val
-                Err err ->  Task.fail err
+                Err err -> Task.fail err
 
 map : Task a err, (a -> b) -> Task b err
 map = \effect, f ->
@@ -57,5 +57,7 @@ render = \framebuffer, palette  ->
         )
         (\_ -> Ok {})
 
-getFrameDelta : Task (Effect.Effect F64) []
-getFrameDelta = succeed Effect.getFrameDelta
+getFrameDelta : Task F64 []
+getFrameDelta =
+    Effect.getFrameDelta
+    |> Effect.map Ok

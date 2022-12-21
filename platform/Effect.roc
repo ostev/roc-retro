@@ -15,8 +15,6 @@ hosted Effect
         , forever
         , loop]
 
-
-
 render : List U8, Nat, Nat, List U32 -> Effect {}
 
 getFrameDelta : Effect F64
