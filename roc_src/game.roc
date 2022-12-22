@@ -9,7 +9,7 @@ tick =
     _ <- Task.await
         ( Task.render
             { width: 256, height: 256, pixels: List.repeat 3 (256 * 256)}
-            ( List.repeat (Num.floor frameInfo.time * 100) 16 )
+            (List.repeat 0xc0d0ef00 16)
         )
     
     # _ <- Task.await
@@ -25,4 +25,6 @@ main =
     # getFrameDeltaAsInt = Task.getFrameDelta |> Task.map (\d -> Effect.map d Num.round)
 
     # frameDelta <- Task.await Task.getFrameDelta
-    Task.loop {} \_ -> Task.map tick Step
+    # Task.loop {} \_ -> Task.map tick Step
+    _ <- Task.await tick
+    main
