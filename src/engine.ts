@@ -43,9 +43,11 @@ export class Engine {
                     //     palette
                     // )
 
-                    this.renderEngine.render(framebuffer, palette, {
-                        width: msg.data[2] as number,
-                        height: msg.data[3] as number
+                    requestAnimationFrame(() => {
+                        this.renderEngine.render(framebuffer, palette, {
+                            width: msg.data[2] as number,
+                            height: msg.data[3] as number
+                        })
                     })
 
                     // console.log("Rendered.")
