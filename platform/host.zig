@@ -7,6 +7,7 @@ const RocStr = str.RocStr;
 
 const RocListU8 = extern struct { elements: [*]u8, length: usize, capacity: usize };
 const RocListU32 = extern struct { elements: [*]u32, length: usize, capacity: usize };
+const FrameInfo = extern struct { time: f64 };
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -32,7 +33,8 @@ extern fn js_render(
     height: usize,
     palette: [*]u32,
 ) void;
-extern fn js_request_animation_frame() void;
+extern fn js_get_time() f64;
+extern fn js_log(msg: f64) void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -64,17 +66,30 @@ pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, pal
     is_rendering = false;
 }
 
-pub export fn roc_fx_getFrameDelta() callconv(.C) f64 {
-    return frame_delta;
+pub export fn roc_fx_beginFrame() callconv(.C) FrameInfo {
+    return FrameInfo{ .time = js_get_time() };
 }
 
-pub export fn roc_fx_waitForAnimationFrame() callconv(.C) void {
-    if (is_rendering) {
-        return;
-    } else {
-        js_request_animation_frame();
-        while (!is_rendering) {}
+fn sleep(ms: u64) void {
+    const start = @floatToInt(u64, js_get_time());
+    while (@floatToInt(u64, js_get_time()) - start < ms) {}
+}
+
+pub export fn roc_fx_endFrame(start: FrameInfo, targetFPS: f64) callconv(.C) void {
+    const time = js_get_time();
+    const delta = time - start.time;
+    const targetDelta = 1000.0 / targetFPS;
+
+    // js_log(targetDelta);
+
+    if (delta < targetDelta) {
+        const sleepTime = (targetDelta - delta);
+        sleep(@floatToInt(u64, sleepTime));
     }
+}
+
+pub export fn roc_fx_log(msg: f64) callconv(.C) void {
+    js_log(msg);
 }
 
 pub export fn set_is_rendering(value: bool) void {

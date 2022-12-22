@@ -67,13 +67,6 @@ async function start(path: string) {
     let exit_code: number | undefined = undefined
     console.log("Starting...")
 
-    function requestRender() {
-        console.log("Render requested")
-        const exports = instance.instance.exports as any
-        exports.set_is_rendering(false)
-        self.postMessage(["requestAnimationFrame"])
-    }
-
     const importObj = {
         wasi_snapshot_preview1: {
             proc_exit: (code: number) => {
@@ -94,7 +87,8 @@ async function start(path: string) {
                     `Remain calm! Do not panic! Roc panicked!`
                 )
             },
-            js_request_animation_frame: requestRender,
+            js_get_time: () => performance.now(),
+            js_log: (msg: number) => console.log(msg),
             js_render: (
                 framebufferPointer: number,
                 framebufferLength: number,

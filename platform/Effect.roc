@@ -6,18 +6,23 @@ hosted Effect
             , forever
             , loop
             , render
-            , getFrameDelta
-            , waitForAnimationFrame ]
+            , beginFrame
+            , endFrame
+            , log
+            , FrameInfo ]
     imports []
     generates Effect with
         [ after
         , map
         , always
         , forever
-        , loop]
+        , loop ]
 
 render : List U8, Nat, Nat, List U32 -> Effect {}
 
-getFrameDelta : Effect F64
+log : F64 -> Effect {}
 
-waitForAnimationFrame : Effect {}
+## Time is in milliseconds
+FrameInfo : { time: F64 }
+beginFrame : Effect FrameInfo
+endFrame : FrameInfo, F64 -> Effect {}

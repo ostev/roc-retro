@@ -49,10 +49,6 @@ export class Engine {
                     })
 
                     // console.log("Rendered.")
-                } else if (msg.data[0] === "requestAnimationFrame") {
-                    requestAnimationFrame(() => {
-                        this.host.postMessage(["beginRender"])
-                    })
                 } else {
                     console.log(
                         "Engine received unknown message from host worker: ",

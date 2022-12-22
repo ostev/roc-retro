@@ -4,10 +4,13 @@ interface Task
         , succeed
         , fail
         , await
+        , loop
         , map
         , render
-        , getFrameDelta
-        , waitForAnimationFrame ]
+        , beginFrame
+        , endFrame
+        , log
+        ]
     imports [ pf.Effect.{ Effect } ]
 
 Task ok err : Effect (Result ok err)
@@ -28,6 +31,20 @@ await = \task, f ->
             when result is
                 Ok val -> f val
                 Err err -> Task.fail err
+
+loop : state, (state -> Task [Step state, Done done] err) -> Task done err
+loop = \state, step ->
+    looper = \current ->
+        step current
+        |> Effect.map
+            \res ->
+                when res is
+                    Ok (Step newState) -> Step newState
+                    Ok (Done done) -> Done (Ok done)
+                    Err e -> Done (Err e)
+
+    Effect.loop state looper
+
 
 map : Task a err, (a -> b) -> Task b err
 map = \effect, f ->
@@ -58,12 +75,20 @@ render = \framebuffer, palette  ->
         )
         (\_ -> Ok {})
 
-getFrameDelta : Task F64 []
-getFrameDelta =
-    Effect.getFrameDelta
-    |> Effect.map Ok
+beginFrame : Task Effect.FrameInfo *
+beginFrame =
+    Effect.map
+        Effect.beginFrame
+        (\frameInfo -> Ok frameInfo)
 
-waitForAnimationFrame : Task {} []
-waitForAnimationFrame =
-    Effect.waitForAnimationFrame
-    |> Effect.map Ok
+endFrame : Effect.FrameInfo, F64 -> Task {} *
+endFrame = \frameInfo, frameTime ->
+    Effect.map
+        ( Effect.endFrame frameInfo frameTime )
+        (\_ -> Ok {})
+
+log : F64 -> Task {} *
+log = \val ->
+    Effect.map
+        ( Effect.log val )
+        (\_ -> Ok {})
