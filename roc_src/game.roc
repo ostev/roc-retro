@@ -1,30 +1,7 @@
 app "game"
     packages { pf: "../platform/main.roc" }
-    imports [ pf.Task.{ Task } ]
+    imports [ pf.Task.{ Task }, pf.Program.{game} ]
     provides [ main ] to pf
 
-tick =
-    frameInfo <- Task.await Task.beginFrame
-
-    _ <- Task.await
-        ( Task.render
-            { width: 256, height: 256, pixels: List.repeat 3 (256 * 256)}
-            (List.repeat 0xc0d0ef00 16)
-        )
-    
-    # _ <- Task.await
-    #     ( Task.log frameInfo.time
-
-    #     )
-    
-    (Task.endFrame frameInfo 60)
-
 main : Task {} []
-main = 
-    # getFrameDeltaAsInt : Task (Effect U32) []
-    # getFrameDeltaAsInt = Task.getFrameDelta |> Task.map (\d -> Effect.map d Num.round)
-
-    # frameDelta <- Task.await Task.getFrameDelta
-    # Task.loop {} \_ -> Task.map tick Step
-    _ <- Task.await tick
-    main
+main = Task.succeed {}

@@ -1,30 +1,60 @@
 interface Gamepad
-    exposes [ Gamepad ]
+    exposes [ Gamepad
+            , Buttons
+            , Dpad
+            , FaceButtons
+            , SystemButtons
+            , default ]
     imports []
 
 Buttons :
     {
-        a : Bool,
-        b : Bool,
-        x : Bool,
-        y : Bool,
-        l : Bool,
-        r : Bool,
-        zl : Bool,
-        zr : Bool,
-        dpad: Dpad
-        lStick : Bool,
-        rStick : Bool,
-        plus : Bool,
-        minus : Bool,
+        face: FaceButtons,
+        dpad: Dpad,
+        system: SystemButtons,
+    }
+
+defaultFaceButtons : FaceButtons
+defaultFaceButtons =
+    {
+        a: Bool.false,
+        b: Bool.false,
+        x: Bool.false,
+        y: Bool.false,
+    }
+
+defaultDpad : Dpad
+defaultDpad =
+    {
+        up: Bool.false,
+        down: Bool.false,
+        left: Bool.false,
+        right: Bool.false,
+    }
+
+defaultSystemButtons : SystemButtons
+defaultSystemButtons =
+    {
+        plus: Bool.false,
+        minus: Bool.false,
+    }
+
+defaultButtons : Buttons
+defaultButtons =
+    {
+        face: defaultFaceButtons,
+        dpad: defaultDpad,
+        system: defaultSystemButtons,
     }
 
 Dpad : { up : Bool, down : Bool, left : Bool, right : Bool }
+FaceButtons : { a : Bool, b : Bool, x : Bool, y : Bool }
+SystemButtons : { plus: Bool, minus: Bool }
 
-Analog :
-    {
-        LStick : { x : F32, y : F32 },
-        RStick : { x : F32, y : F32 },
+Gamepad : { buttons : Buttons }
+
+default : Gamepad
+default =
+    { buttons:defaultButtons
+        
     }
-
-Gamepad : { buttons : Buttons, analog : Analog}
