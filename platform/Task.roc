@@ -11,7 +11,7 @@ interface Task
         , endFrame
         , log
         ]
-    imports [ pf.Effect.{ Effect } ]
+    imports [ pf.Effect.{ Effect }, pf.Frame.{ Framebuffer, Palette, FrameInfo } ]
 
 Task ok err : Effect (Result ok err)
 
@@ -55,8 +55,6 @@ map = \effect, f ->
                 Ok val -> Ok (f val)
                 Err err -> Err err
 
-Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
-Palette : List U32
 
 # requestAnimationFrame : Task {} [] -> Task {} []
 # requestAnimationFrame = \task ->
@@ -75,13 +73,13 @@ render = \framebuffer, palette  ->
         )
         (\_ -> Ok {})
 
-beginFrame : Task Effect.FrameInfo *
+beginFrame : Task FrameInfo *
 beginFrame =
     Effect.map
         Effect.beginFrame
         (\frameInfo -> Ok frameInfo)
 
-endFrame : Effect.FrameInfo, F64 -> Task {} *
+endFrame : FrameInfo, F64 -> Task {} *
 endFrame = \frameInfo, frameTime ->
     Effect.map
         ( Effect.endFrame frameInfo frameTime )
