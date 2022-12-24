@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 
-# Added by cargo
 
 /target
+
+bin/

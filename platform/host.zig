@@ -1,9 +1,6 @@
 // This ia a modified version of https://github.com/roc-lang/roc/blob/main/examples/platform-switching/web-assembly-platform/host.zig
 
 const std = @import("std");
-const str = @import("str");
-const builtin = @import("builtin");
-const RocStr = str.RocStr;
 
 const RocListU8 = extern struct { elements: [*]u8, length: usize, capacity: usize };
 const RocListU32 = extern struct { elements: [*]u32, length: usize, capacity: usize };
@@ -55,7 +52,7 @@ extern fn js_render(
 ) void;
 extern fn js_get_time() f64;
 extern fn js_log(msg: f64) void;
-extern fn js_read_input() [1]u16;
+extern fn js_read_input() [*]u16;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
