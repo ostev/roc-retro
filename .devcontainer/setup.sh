@@ -14,7 +14,11 @@ apt-get install -y \
   clang \
   libasound2 \
   libtinfo6 \
-  openssl
+  openssl \
+  libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+  libxkbcommon-dev \
+  zlib1g-dev
+
 
 # ## Install rustup and common components
 curl https://sh.rustup.rs -sSf | sh -s -- -y 
