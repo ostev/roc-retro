@@ -17,15 +17,15 @@ apt-get install -y \
   openssl
 
 # ## Install rustup and common components
-# curl https://sh.rustup.rs -sSf | sh -s -- -y 
-# rustup install nightly
-# rustup component add rustfmt
-# rustup component add rustfmt --toolchain nightly
-# rustup component add clippy 
-# rustup component add clippy --toolchain nightly
+curl https://sh.rustup.rs -sSf | sh -s -- -y 
+rustup install nightly
+rustup component add rustfmt
+rustup component add rustfmt --toolchain nightly
+rustup component add clippy 
+rustup component add clippy --toolchain nightly
 
-# cargo install cargo-expand
-# cargo install cargo-edit
+cargo install cargo-expand
+cargo install cargo-edit
 
 # Install Zig
 wget https://ziglang.org/download/0.9.1/zig-linux-x86_64-0.9.1.tar.xz
@@ -33,9 +33,9 @@ tar -xf zig-linux-x86_64-0.9.1.tar.xz
 sudo ln -s  $(pwd)/zig-linux-x86_64-0.9.1/zig /usr/local/bin/zig
 
 # Install Roc
-wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-2022-12-23-4022b44.tar.gz
-tar -xf roc_nightly-linux_x86_64-2022-12-23-4022b44.tar.gz --one-top-level
-sudo mv $(pwd)/roc_nightly-linux_x86_64-2022-12-23-4022b44/roc /usr/local/bin/roc
+# wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-2022-12-23-4022b44.tar.gz
+# tar -xf roc_nightly-linux_x86_64-2022-12-23-4022b44.tar.gz --one-top-level
+# sudo mv $(pwd)/roc_nightly-linux_x86_64-2022-12-23-4022b44/roc /usr/local/bin/roc
 
 # Install Node
 curl https://get.volta.sh | bash
