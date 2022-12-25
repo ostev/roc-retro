@@ -6,8 +6,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "build-roc": "rm platform/zig-cache -r; cd roc && roc build ../roc_src/game.roc --target=wasm32 && mv roc_src/game.wasm public/game.wasm",
-        "check-roc": "cd roc && roc check ../roc_src/game.roc && mv roc_src/game.wasm public/game.wasm",
+        "build-roc": "rm platform/zig-cache -r; cd roc && target/release/roc build ../roc_src/game.roc --target=wasm32 && cd .. && mv roc_src/game.wasm public/game.wasm",
+        "check-roc": "cd roc && target/release/roc check ../roc_src/game.roc && cd .. && mv roc_src/game.wasm ../public/game.wasm",
         "preview": "vite preview"
     },
     "devDependencies": {
