@@ -21,5 +21,4 @@ tick = \fps ->
 game = \fps ->
     gamepad <- Task.await (Task.readGamepad)
     
-    _ <- Task.await (tick fps)
-    game fps
+    Task.loop {} \_ -> Task.map (tick fps) Step

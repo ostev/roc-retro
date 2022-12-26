@@ -6,4 +6,4 @@ app "game"
 main : Task {} []
 main =
     # Task.succeed {}
-    game 1
+    game 120
