@@ -1,5 +1,6 @@
 import hostUrl from "./host?url"
 import { RenderEngine } from "./render/engine"
+import { InputReader } from "./input"
 
 export class WebGLNotSupportedError extends Error {
     constructor(message: string) {
@@ -11,8 +12,13 @@ export class Engine {
     private host: Worker
     private gl: WebGLRenderingContext
     private renderEngine: RenderEngine
+    private inputBuffer: SharedArrayBuffer
+    private inputReader: InputReader
 
     constructor(canvasElement: HTMLCanvasElement) {
+        this.inputBuffer = new SharedArrayBuffer(4)
+        this.inputReader = new InputReader(new Uint32Array(this.inputBuffer))
+
         {
             const maybeGl = canvasElement.getContext("webgl")
 
@@ -62,6 +68,6 @@ export class Engine {
     }
 
     start = (wasmUrl: string) => {
-        this.host.postMessage(["start", wasmUrl])
+        this.host.postMessage(["start", wasmUrl, this.inputBuffer])
     }
 }

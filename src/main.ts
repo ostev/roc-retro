@@ -1,17 +1,4 @@
-import { RenderEngine } from "./render/engine"
-// import { toRGBA } from "./render/framebuffer"
-import {
-    createPalette,
-    floatLookup,
-    paletteToTextureData,
-    paletteToVec3Array
-} from "./render/palette"
-import { benchmark } from "./benchmark"
-import hostUrl from "./host?url"
 import { Engine } from "./engine"
-import { installWorkerIfCOIHeadersNotSet } from "./coi-fix"
-
-await installWorkerIfCOIHeadersNotSet()
 
 // Draw a basic scene
 const canvas = document.createElement("canvas")

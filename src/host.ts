@@ -1,9 +1,26 @@
 let instance: WebAssembly.WebAssemblyInstantiatedSource
+let inputBuffer: SharedArrayBuffer
 
-self.onmessage = (msg: MessageEvent<string>) => {
+class InputBufferNotProvidedError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = "InputBufferNotProvidedError"
+    }
+}
+
+self.onmessage = (
+    msg: MessageEvent<[string, string, SharedArrayBuffer | undefined]>
+) => {
     if (msg.data[0] === "start") {
+        let [command, wasmUrl, inputBufferFromMainThread] = msg.data
+
+        if (inputBufferFromMainThread === undefined) {
+            throw new InputBufferNotProvidedError("Input buffer not provided")
+        }
+        inputBuffer = inputBufferFromMainThread
+
         console.log("Host worker starting Roc runtime...")
-        ;(async () => await start(msg.data[1]))()
+        ;(async () => await start(wasmUrl))()
     } else {
         console.log("Host worker received unknown message:", msg)
     }

@@ -13,20 +13,29 @@ enum Button {
     Minus = "-"
 }
 
-class InputReader {
+export class InputReader {
     private keysPressed: Map<string, boolean> = new Map()
+    private destinationBuffer: Uint32Array
 
-    constructor() {
+    constructor(destinationBuffer: Uint32Array) {
+        this.destinationBuffer = destinationBuffer
+
         document.addEventListener("keydown", (event) => {
             this.keysPressed.set(event.key, true)
+            this.updateDestinationBuffer()
         })
 
         document.addEventListener("keyup", (event) => {
             this.keysPressed.set(event.key, false)
+            this.updateDestinationBuffer()
         })
     }
 
-    read(): number {
+    updateDestinationBuffer = () => {
+        this.destinationBuffer[0] = this.read()
+    }
+
+    read = (): number => {
         const buttonCodes: number[] = Array.from(this.keysPressed).map(
             ([button, isPressed]) => {
                 switch (button) {
