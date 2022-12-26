@@ -6,4 +6,4 @@ Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
 
 Palette : List U32
 
-FrameInfo : { time: F64, inputState: Input.State }
+FrameInfo : { time: F64 }

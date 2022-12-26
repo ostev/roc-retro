@@ -17,5 +17,5 @@ tick = \fps ->
     (Task.endFrame frameInfo fps)
 
 game = \fps ->
-    # _ <- Task.await (tick fps)
+    _ <- Task.await (tick fps)
     game fps

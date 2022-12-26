@@ -9,6 +9,7 @@ hosted Effect
             , beginFrame
             , endFrame
             , log
+            , readInput
             ]
     imports [pf.Frame.{FrameInfo}]
     generates Effect with
@@ -24,3 +25,5 @@ log : F64 -> Effect {}
 
 beginFrame : Effect FrameInfo
 endFrame : FrameInfo, F64 -> Effect {}
+
+readInput : Effect U32

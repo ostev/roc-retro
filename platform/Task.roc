@@ -9,6 +9,7 @@ interface Task
         , render
         , beginFrame
         , endFrame
+        , readInput
         , log
         ]
     imports [ pf.Effect.{ Effect }, pf.Frame.{ Framebuffer, Palette, FrameInfo } ]
@@ -84,6 +85,12 @@ endFrame = \frameInfo, frameTime ->
     Effect.map
         ( Effect.endFrame frameInfo frameTime )
         (\_ -> Ok {})
+
+readInput : Task U32 *
+readInput =
+    Effect.map
+        Effect.readInput
+        (\input -> Ok input)
 
 log : F64 -> Task {} *
 log = \val ->

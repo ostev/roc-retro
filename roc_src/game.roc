@@ -4,4 +4,9 @@ app "game"
     provides [ main ] to pf
 
 main : Task {} []
-main = Task.succeed {}
+main =
+    input <- Task.await Task.readInput
+
+    _ <- Task.await (Task.log (Num.toFrac input))
+
+    Task.succeed {}

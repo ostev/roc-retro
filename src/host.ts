@@ -89,6 +89,7 @@ async function start(path: string) {
             },
             js_get_time: () => performance.now(),
             js_log: (msg: number) => console.log(msg),
+            js_read_input: () => 0,
             js_render: (
                 framebufferPointer: number,
                 framebufferLength: number,

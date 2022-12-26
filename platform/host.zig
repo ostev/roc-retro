@@ -24,7 +24,7 @@ const SystemButtons = extern struct {
 const Buttons = extern struct { face: FaceButtons, dpad: Dpad, system: SystemButtons };
 const Gamepad = extern struct { buttons: Buttons };
 const InputState = extern struct { justPressed: Gamepad, pressed: Gamepad };
-const FrameInfo = extern struct { time: f64, inputState: InputState };
+const FrameInfo = extern struct { time: f64 };
 
 const Align = extern struct { a: usize, b: usize };
 extern fn malloc(size: usize) callconv(.C) ?*align(@alignOf(Align)) anyopaque;
@@ -52,7 +52,7 @@ extern fn js_render(
 ) void;
 extern fn js_get_time() f64;
 extern fn js_log(msg: f64) void;
-extern fn js_read_input() [*]u16;
+extern fn js_read_input() f64;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -85,51 +85,11 @@ pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, pal
 }
 
 pub export fn roc_fx_beginFrame() callconv(.C) FrameInfo {
-    const raw_input = js_read_input();
-    const input = InputState{
-        .justPressed = Gamepad{
-            .buttons = Buttons{
-                .face = FaceButtons{
-                    .a = raw_input[0] & 0x0001 != 0,
-                    .b = raw_input[0] & 0x0002 != 0,
-                    .x = raw_input[0] & 0x0004 != 0,
-                    .y = raw_input[0] & 0x0008 != 0,
-                },
-                .dpad = Dpad{
-                    .up = raw_input[0] & 0x0010 != 0,
-                    .down = raw_input[0] & 0x0020 != 0,
-                    .left = raw_input[0] & 0x0040 != 0,
-                    .right = raw_input[0] & 0x0080 != 0,
-                },
-                .system = SystemButtons{
-                    .plus = raw_input[0] & 0x0100 != 0,
-                    .minus = raw_input[0] & 0x0200 != 0,
-                },
-            },
-        },
-        .pressed = Gamepad{
-            .buttons = Buttons{
-                .face = FaceButtons{
-                    .a = raw_input[0] & 0x0001 != 0,
-                    .b = raw_input[0] & 0x0002 != 0,
-                    .x = raw_input[0] & 0x0004 != 0,
-                    .y = raw_input[0] & 0x0008 != 0,
-                },
-                .dpad = Dpad{
-                    .up = raw_input[0] & 0x0010 != 0,
-                    .down = raw_input[0] & 0x0020 != 0,
-                    .left = raw_input[0] & 0x0040 != 0,
-                    .right = raw_input[0] & 0x0080 != 0,
-                },
-                .system = SystemButtons{
-                    .plus = raw_input[0] & 0x0100 != 0,
-                    .minus = raw_input[0] & 0x0200 != 0,
-                },
-            },
-        },
-    };
+    return FrameInfo{ .time = js_get_time() };
+}
 
-    return FrameInfo{ .time = js_get_time(), .inputState = input };
+pub export fn roc_fx_readInput() callconv(.C) u32 {
+    return @floatToInt(u32, js_read_input());
 }
 
 fn sleep(ms: u64) void {
@@ -148,10 +108,6 @@ pub export fn roc_fx_endFrame(start: FrameInfo, targetFPS: f64) callconv(.C) voi
         const sleepTime = (targetDelta - delta);
         sleep(@floatToInt(u64, sleepTime));
     }
-}
-
-pub export fn roc_fx_readInput() callconv(.C) u16 {
-    return js_read_input()[0];
 }
 
 pub export fn roc_fx_log(msg: f64) callconv(.C) void {
