@@ -9,6 +9,9 @@ import {
 import { benchmark } from "./benchmark"
 import hostUrl from "./host?url"
 import { Engine } from "./engine"
+import { installWorkerIfCOIHeadersNotSet } from "./coi-fix"
+
+await installWorkerIfCOIHeadersNotSet()
 
 // Draw a basic scene
 const canvas = document.createElement("canvas")

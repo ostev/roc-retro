@@ -4,9 +4,6 @@ self.onmessage = (msg: MessageEvent<string>) => {
     if (msg.data[0] === "start") {
         console.log("Host worker starting Roc runtime...")
         ;(async () => await start(msg.data[1]))()
-    } else if (msg.data[0] === "beginRender") {
-        ;(instance.instance.exports as any).set_is_rendering(true)
-        console.log("Animation frame arrived")
     } else {
         console.log("Host worker received unknown message:", msg)
     }
