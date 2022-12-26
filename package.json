@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "setup": "cd roc && cargo build --release",
         "build": "tsc && vite build",
         "build-roc": "cd roc && target/release/roc build ../roc_src/game.roc --target=wasm32; mv ../roc_src/game.wasm ../public/game.wasm",
         "check-roc": "cd roc && target/release/roc check ../roc_src/game.roc; mv roc_src/game.wasm ../public/game.wasm",
