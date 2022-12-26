@@ -5,8 +5,9 @@ app "game"
 
 main : Task {} []
 main =
-    input <- Task.await Task.readInput
+    # input <- Task.await Task.readInput
 
-    _ <- Task.await (Task.log (Num.toFrac input))
+    # _ <- Task.await (Task.log (Num.toFrac input))
 
-    Task.succeed {}
+    # Task.succeed {}
+    game 60
