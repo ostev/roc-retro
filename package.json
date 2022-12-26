@@ -6,11 +6,12 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "build-roc": "rm platform/zig-cache -r; cd roc && target/release/roc build ../roc_src/game.roc --target=wasm32; mv ../roc_src/game.wasm ../public/game.wasm",
+        "build-roc": "cd roc && target/release/roc build ../roc_src/game.roc --target=wasm32; mv ../roc_src/game.wasm ../public/game.wasm",
         "check-roc": "cd roc && target/release/roc check ../roc_src/game.roc; mv roc_src/game.wasm ../public/game.wasm",
         "preview": "vite preview"
     },
     "devDependencies": {
+        "@types/node": "^18.11.18",
         "@types/serviceworker": "^0.0.59",
         "prettier": "^2.8.1",
         "typescript": "^4.9.3",

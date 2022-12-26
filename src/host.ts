@@ -1,5 +1,5 @@
 let instance: WebAssembly.WebAssemblyInstantiatedSource
-let inputBuffer: SharedArrayBuffer
+let inputBuffer: Uint32Array
 
 class InputBufferNotProvidedError extends Error {
     constructor(message: string) {
@@ -17,7 +17,7 @@ self.onmessage = (
         if (inputBufferFromMainThread === undefined) {
             throw new InputBufferNotProvidedError("Input buffer not provided")
         }
-        inputBuffer = inputBufferFromMainThread
+        inputBuffer = new Uint32Array(inputBufferFromMainThread)
 
         console.log("Host worker starting Roc runtime...")
         ;(async () => await start(wasmUrl))()
@@ -103,7 +103,7 @@ async function start(path: string) {
             },
             js_get_time: () => performance.now(),
             js_log: (msg: number) => console.log(msg),
-            js_read_input: () => 0,
+            js_read_input: () => inputBuffer[0],
             js_render: (
                 framebufferPointer: number,
                 framebufferLength: number,

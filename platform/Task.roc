@@ -1,18 +1,24 @@
 interface Task
-    exposes 
-        [ Task
-        , succeed
-        , fail
-        , await
-        , loop
-        , map
-        , render
-        , beginFrame
-        , endFrame
-        , readInput
-        , log
-        ]
-    imports [ pf.Effect.{ Effect }, pf.Frame.{ Framebuffer, Palette, FrameInfo } ]
+    exposes
+    [
+        Task,
+        succeed,
+        fail,
+        await,
+        loop,
+        map,
+        render,
+        beginFrame,
+        endFrame,
+        readGamepad,
+        log,
+        readRawGamepad
+    ]
+    imports [
+        pf.Effect.{ Effect },
+        pf.Frame.{ Framebuffer, Palette, FrameInfo },
+        pf.Gamepad.{Gamepad}
+    ]
 
 Task ok err : Effect (Result ok err)
 
@@ -46,7 +52,6 @@ loop = \state, step ->
 
     Effect.loop state looper
 
-
 map : Task a err, (a -> b) -> Task b err
 map = \effect, f ->
     Effect.map
@@ -56,21 +61,20 @@ map = \effect, f ->
                 Ok val -> Ok (f val)
                 Err err -> Err err
 
-
 # requestAnimationFrame : Task {} [] -> Task {} []
 # requestAnimationFrame = \task ->
 #     Effect.map
 #         ( Effect.requestAnimationFrame task )
 #         (\_ -> Ok {})
-
 render : Framebuffer, Palette -> Task {} *
-render = \framebuffer, palette  ->
+render = \framebuffer, palette ->
     Effect.map
-        ( Effect.render
-            framebuffer.pixels
-            framebuffer.width
-            framebuffer.height
-            palette
+        (
+            Effect.render
+                framebuffer.pixels
+                framebuffer.width
+                framebuffer.height
+                palette
         )
         (\_ -> Ok {})
 
@@ -83,17 +87,24 @@ beginFrame =
 endFrame : FrameInfo, F64 -> Task {} *
 endFrame = \frameInfo, frameTime ->
     Effect.map
-        ( Effect.endFrame frameInfo frameTime )
+        (Effect.endFrame frameInfo frameTime)
         (\_ -> Ok {})
 
-readInput : Task U32 *
-readInput =
+readRawGamepad = Effect.map Effect.readInput (\input -> Ok input)
+
+readGamepad: Task Gamepad *
+readGamepad=
     Effect.map
         Effect.readInput
-        (\input -> Ok input)
+        (\input ->
+            input
+            |> Gamepad.fromU32
+            |> Ok
+        )
+    
 
 log : F64 -> Task {} *
 log = \val ->
     Effect.map
-        ( Effect.log val )
+        (Effect.log val)
         (\_ -> Ok {})

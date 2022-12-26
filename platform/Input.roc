@@ -1,10 +1,10 @@
 interface Input
-    exposes [ State, default ]
+    exposes [State, default]
     imports [
-            pf.Gamepad.{ Gamepad }
-            ]
+        pf.Gamepad.{ Gamepad },
+    ]
 
-State : { justPressed: Gamepad, pressed: Gamepad }
+State : { justPressed : Gamepad, pressed : Gamepad }
 
 default : State
 default = { justPressed: Gamepad.default, pressed: Gamepad.default }
