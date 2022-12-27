@@ -101,7 +101,7 @@ readGamepad=
             |> Gamepad.fromU32
             |> Ok
         )
-    
+
 
 log : F64 -> Task {} *
 log = \val ->

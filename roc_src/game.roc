@@ -5,4 +5,9 @@ app "game"
 
 main : Task {} []
 main =
-    game 120 []
+    game {
+        fps: 120,
+        init : 0,
+        update: \model, gamepad ->
+            model |> Num.addWrap 1,
+    }
