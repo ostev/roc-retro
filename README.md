@@ -8,7 +8,7 @@ A work-in-progress platform for building retro video games for the Roc programmi
 -   [x] Begin work on Web Audio API audio backend
 -   [x] Implement basic Roc frontend
 -   [x] Implement fixed frame rate game loop
--   [ ] Add persistent state
+-   [x] Add persistent state
 -   [x] Add keyboard input
 -   [ ] Add mouse input
 -   [ ] Decide on a better name
