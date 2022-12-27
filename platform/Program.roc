@@ -22,6 +22,8 @@ tick = \fps ->
 game = \fps ->
     # Note that, for whatever reason, keeping any value from
     # a Task causes the program to exceed the maximum call stack size.
+    # For example, the following line cause this `RangeError: Maximum call stack size exceeded`:
+    # gamepad <- Task.await (Task.readRawGamepad)
 
     # Task.loop {} \_ -> Task.map (tick fps) Step
     _ <- Task.await (tick fps)
