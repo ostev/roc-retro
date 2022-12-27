@@ -13,12 +13,12 @@ interface Task
         readGamepad,
         log,
         sleep,
-        readRawGamepad
+        readRawGamepad,
     ]
     imports [
         pf.Effect.{ Effect },
         pf.Frame.{ Framebuffer, Palette, FrameInfo },
-        pf.Gamepad.{Gamepad}
+        pf.Gamepad.{ Gamepad },
     ]
 
 Task ok err : Effect (Result ok err)
@@ -92,8 +92,8 @@ endFrame = \frameInfo, frameTime ->
 
 readRawGamepad = Effect.always (Ok 0)
 
-readGamepad: Task Gamepad *
-readGamepad=
+readGamepad : Task Gamepad *
+readGamepad =
     Effect.map
         Effect.readInput
         (\input ->
@@ -101,7 +101,6 @@ readGamepad=
             |> Gamepad.fromU32
             |> Ok
         )
-
 
 log : F64 -> Task {} *
 log = \val ->
