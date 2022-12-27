@@ -16,6 +16,6 @@ main =
                 height: 256,
                 width: 256,
             },
-            palette: List.repeat 0 16,
+            palette: List.repeat 0 (model * 100),
         },
     }
