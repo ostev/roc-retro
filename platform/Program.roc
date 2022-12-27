@@ -30,15 +30,17 @@ tick = \model, update, render, fps ->
 
     Task.succeed newModel
 
+helper : model, Game model -> Task {} []
+helper = \model, config ->
+    newModel <- Task.await (tick model config.update config.render config.fps)
+    helper newModel config
+
 game : Game model -> Task {} []
 game = \config ->
     # Note that, for whatever reason, keeping any value from
     # a Task causes the program to exceed the maximum call stack size.
     # For example, the following line cause this `RangeError: Maximum call stack size exceeded`:
     # gamepad <- Task.await (Task.readRawGamepad)
-    helper = \model ->
-        newModel <- Task.await (tick model config.update config.render config.fps)
-        helper newModel
-
-    helper config.init
+    
+    helper config.init config
 
