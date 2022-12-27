@@ -5,4 +5,4 @@ app "game"
 
 main : Task {} []
 main =
-    game 120
+    game 120 []

@@ -8,7 +8,8 @@ Game model : {
     render : model -> Render.Info,
 }
 
-tick = \fps ->
+# tick : F32, model -> Task model []
+tick = \fps, model ->
     frameInfo <- Task.await Task.beginFrame
     gamepad <- Task.await (Task.readRawGamepad)
     _ <- Task.await
@@ -17,14 +18,16 @@ tick = \fps ->
                     { width: 256, height: 256, pixels: List.repeat 3 (256 * 256) }
                     (List.repeat 0xc0d0ef00 16)
             )
-    Task.endFrame frameInfo fps
+    _ <- Task.await (Task.endFrame frameInfo fps)
+    Task.succeed (if List.len model < 200000 then List.append model gamepad else model)
 
-game = \fps ->
+# game : F32, model -> Task {} []
+game = \fps, model ->
     # Note that, for whatever reason, keeping any value from
     # a Task causes the program to exceed the maximum call stack size.
     # For example, the following line cause this `RangeError: Maximum call stack size exceeded`:
     # gamepad <- Task.await (Task.readRawGamepad)
 
     # Task.loop {} \_ -> Task.map (tick fps) Step
-    _ <- Task.await (tick fps)
-    game fps
+    newModel <- Task.await (tick fps model)
+    game fps newModel
