@@ -9,6 +9,7 @@ hosted Effect
             , beginFrame
             , endFrame
             , log
+            , sleep
             , readInput
             ]
     imports [pf.Frame.{FrameInfo}]
@@ -27,3 +28,5 @@ beginFrame : Effect FrameInfo
 endFrame : FrameInfo, F64 -> Effect {}
 
 readInput : Effect U32
+
+sleep : U64 -> Effect {}

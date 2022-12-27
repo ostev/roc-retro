@@ -10,6 +10,7 @@ Game model : {
 
 tick = \fps ->
     frameInfo <- Task.await Task.beginFrame
+    gamepad <- Task.await (Task.readRawGamepad)
     _ <- Task.await
             (
                 Task.render
@@ -19,6 +20,9 @@ tick = \fps ->
     Task.endFrame frameInfo fps
 
 game = \fps ->
-    gamepad <- Task.await (Task.readGamepad)
-    
-    Task.loop {} \_ -> Task.map (tick fps) Step
+    # Note that, for whatever reason, keeping any value from
+    # a Task causes the program to exceed the maximum call stack size.
+
+    # Task.loop {} \_ -> Task.map (tick fps) Step
+    _ <- Task.await (tick fps)
+    game fps

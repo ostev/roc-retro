@@ -53,6 +53,7 @@ extern fn js_render(
 extern fn js_get_time() f64;
 extern fn js_log(msg: f64) void;
 extern fn js_read_input() f64;
+extern fn js_nothing(f64) void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -112,6 +113,10 @@ pub export fn roc_fx_endFrame(start: FrameInfo, targetFPS: f64) callconv(.C) voi
 
 pub export fn roc_fx_log(msg: f64) callconv(.C) void {
     js_log(msg);
+}
+
+pub export fn roc_fx_sleep(ms: u64) callconv(.C) void {
+    sleep(ms);
 }
 
 pub export fn set_is_rendering(value: bool) void {

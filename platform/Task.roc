@@ -12,6 +12,7 @@ interface Task
         endFrame,
         readGamepad,
         log,
+        sleep,
         readRawGamepad
     ]
     imports [
@@ -49,7 +50,6 @@ loop = \state, step ->
                     Ok (Step newState) -> Step newState
                     Ok (Done done) -> Done (Ok done)
                     Err e -> Done (Err e)
-
     Effect.loop state looper
 
 map : Task a err, (a -> b) -> Task b err
@@ -90,7 +90,7 @@ endFrame = \frameInfo, frameTime ->
         (Effect.endFrame frameInfo frameTime)
         (\_ -> Ok {})
 
-readRawGamepad = Effect.map Effect.readInput (\input -> Ok input)
+readRawGamepad = Effect.always (Ok 0)
 
 readGamepad: Task Gamepad *
 readGamepad=
@@ -107,4 +107,10 @@ log : F64 -> Task {} *
 log = \val ->
     Effect.map
         (Effect.log val)
+        (\_ -> Ok {})
+
+sleep : U64 -> Task {} *
+sleep = \ms ->
+    Effect.map
+        (Effect.sleep ms)
         (\_ -> Ok {})
