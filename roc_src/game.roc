@@ -6,16 +6,17 @@ app "game"
 main : Task {} []
 main =
     game {
-        fps: 60,
-        init: 0,
-        update: \model, gamepad ->
-            model |> Num.addWrap 1,
-        render: \model -> {
+        fps: 100,
+        init: Pair (List.repeat 10 (256*256)) [],
+        # This leaks memory
+        update: \(Pair pixels oldPixels), gamepad ->
+            (Pair (List.repeat 10 (256*256)) oldPixels),
+        render: \(Pair pixels oldPixels) -> {
             framebuffer: {
-                pixels: List.repeat 0 (256 * 256),
+                pixels: pixels,
                 height: 256,
                 width: 256,
             },
-            palette: List.repeat 0 (model * 100),
+            palette: oldPixels |> List.map Num.toU32,
         },
     }

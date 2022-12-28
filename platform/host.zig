@@ -70,7 +70,6 @@ export fn roc_realloc(c_ptr: *anyopaque, new_size: usize, old_size: usize, align
 
 export fn roc_dealloc(c_ptr: *anyopaque, alignment: u32) callconv(.C) void {
     _ = alignment;
-
     free(@alignCast(@alignOf(Align), @ptrCast([*]u8, c_ptr)));
 }
 
