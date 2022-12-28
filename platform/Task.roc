@@ -6,6 +6,7 @@ interface Task
         fail,
         await,
         loop,
+        forever,
         map,
         render,
         beginFrame,
@@ -51,6 +52,17 @@ loop = \state, step ->
                     Ok (Done done) -> Done (Ok done)
                     Err e -> Done (Err e)
     Effect.loop state looper
+
+forever : Task val err -> Task * err
+forever = \task ->
+    looper = \{} ->
+        task
+        |> Effect.map
+            \res ->
+                when res is
+                    Ok _ -> Step {}
+                    Err e -> Done (Err e)
+    Effect.loop {} looper
 
 map : Task a err, (a -> b) -> Task b err
 map = \effect, f ->
