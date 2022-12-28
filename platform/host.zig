@@ -53,7 +53,7 @@ extern fn js_render(
 extern fn js_get_time() f64;
 extern fn js_log(msg: f64) void;
 extern fn js_read_input() f64;
-extern fn js_nothing(f64) void;
+extern fn js_end_frame(startTime: f64, targetFPS: f64) void;
 
 export fn roc_alloc(size: usize, alignment: u32) callconv(.C) ?*anyopaque {
     _ = alignment;
@@ -99,16 +99,7 @@ fn sleep(ms: u64) void {
 }
 
 pub export fn roc_fx_endFrame(start: FrameInfo, targetFPS: f64) callconv(.C) void {
-    const time = js_get_time();
-    const delta = time - start.time;
-    const targetDelta = 1000.0 / targetFPS;
-
-    // js_log(targetDelta);
-
-    if (delta < targetDelta) {
-        const sleepTime = (targetDelta - delta);
-        sleep(@floatToInt(u64, sleepTime));
-    }
+    js_end_frame(start.time, targetFPS);
 }
 
 pub export fn roc_fx_log(msg: f64) callconv(.C) void {

@@ -1,6 +1,9 @@
 let instance: WebAssembly.WebAssemblyInstantiatedSource
 let inputBuffer: Uint32Array
 
+/// This is waited on by `Atomics.wait` in `js_end_frame`
+let sleepBuffer: Int32Array = new Int32Array(new SharedArrayBuffer(4))
+
 class InputBufferNotProvidedError extends Error {
     constructor(message: string) {
         super(message)
@@ -8,16 +11,28 @@ class InputBufferNotProvidedError extends Error {
     }
 }
 
+class SleepBufferNotProvidedError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = "SleepBufferNotProvidedError"
+    }
+}
+
 self.onmessage = (
     msg: MessageEvent<[string, string, SharedArrayBuffer | undefined]>
 ) => {
     if (msg.data[0] === "start") {
-        let [command, wasmUrl, inputBufferFromMainThread] = msg.data
+        let [command, wasmUrl, inputBufferRaw] = msg.data
 
-        if (inputBufferFromMainThread === undefined) {
+        if (inputBufferRaw === undefined) {
             throw new InputBufferNotProvidedError("Input buffer not provided")
         }
-        inputBuffer = new Uint32Array(inputBufferFromMainThread)
+        inputBuffer = new Uint32Array(inputBufferRaw)
+
+        // if (sleepBufferRaw === undefined) {
+        //     throw new SleepBufferNotProvidedError("Sleep buffer not provided")
+        // }
+        // sleepBuffer = new Int32Array(sleepBufferRaw)
 
         console.log("Host worker starting Roc runtime...")
         ;(async () => await start(wasmUrl))()
@@ -104,7 +119,21 @@ async function start(path: string) {
             js_get_time: () => performance.now(),
             js_log: (msg: number) => console.log(msg),
             js_read_input: () => inputBuffer[0],
-            js_nothing: (_: any) => {},
+            js_end_frame: (startTime: number, targetFPS: number) => {
+                const time = performance.now()
+                const delta = time - startTime
+                const targetDelta = 1000.0 / targetFPS
+
+                // js_log(targetDelta);
+
+                if (delta < targetDelta) {
+                    const sleepTime = targetDelta - delta
+
+                    // self.postMessage(["beginSleep", sleepTime])
+                    Atomics.wait(sleepBuffer, 0, 0, sleepTime)
+                    // self.postMessage(["endSleep"])
+                }
+            },
             js_render: (
                 framebufferPointer: number,
                 framebufferLength: number,
