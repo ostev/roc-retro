@@ -82,6 +82,7 @@ pub export fn roc_fx_render(pixels: *RocListU8, width: usize, height: usize, pal
     is_rendering = true;
     js_render(pixels.elements, pixels.length, width, height, palette.elements);
     is_rendering = false;
+    roc_dealloc(pixels, 0);
 }
 
 pub export fn roc_fx_beginFrame() callconv(.C) FrameInfo {
