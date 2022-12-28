@@ -37,7 +37,7 @@ self.onmessage = (
         console.log("Host worker starting Roc runtime...")
         ;(async () => await start(wasmUrl))()
     } else {
-        console.log("Host worker received unknown message:", msg)
+        console.warn("Host worker received unknown message:", msg)
     }
 }
 
@@ -133,6 +133,8 @@ async function start(path: string) {
                     Atomics.wait(sleepBuffer, 0, 0, sleepTime)
                     // self.postMessage(["endSleep"])
                 }
+
+                self.postMessage(["frameDelta", delta])
             },
             js_render: (
                 framebufferPointer: number,

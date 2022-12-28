@@ -1,3 +1,5 @@
+import "./main.scss"
+
 import { Engine } from "./engine"
 
 // Draw a basic scene
@@ -7,7 +9,12 @@ canvas.width = 256
 canvas.height = 256
 document.body.appendChild(canvas)
 
-const engine = new Engine(canvas)
+const debugElement = document.getElementById("debug")
+if (debugElement === null) {
+    throw new Error("Where is the debug menu?")
+}
+
+const engine = new Engine(canvas, debugElement)
 engine.start("/game.wasm")
 
 // const gl = canvas.getContext("webgl")

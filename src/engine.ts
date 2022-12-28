@@ -14,8 +14,9 @@ export class Engine {
     private renderEngine: RenderEngine
     private inputBuffer: SharedArrayBuffer
     private inputReader: InputReader
+    private frameDeltas: number[] = []
 
-    constructor(canvasElement: HTMLCanvasElement) {
+    constructor(canvasElement: HTMLCanvasElement, debugElement: HTMLElement) {
         this.inputBuffer = new SharedArrayBuffer(4)
         this.inputReader = new InputReader(new Uint32Array(this.inputBuffer))
 
@@ -57,8 +58,45 @@ export class Engine {
                     })
 
                     // console.log("Rendered.")
+                } else if (msg.data[0] === "frameDelta") {
+                    const frameDelta = Number(msg.data[1])
+
+                    if (this.frameDeltas.length >= 30) {
+                        this.frameDeltas.shift()
+                    }
+                    this.frameDeltas.push(frameDelta)
+
+                    /// The average frame delta of the past 30 frames
+                    const averageFrameDelta =
+                        this.frameDeltas.reduce((a, b) => a + b, 0) /
+                        this.frameDeltas.length
+
+                    /// The average FPS of the past 30 frames
+                    const averageFPS = 1000 / averageFrameDelta
+
+                    const fpsElement = debugElement.querySelector(".fps")
+
+                    if (fpsElement !== null) {
+                        fpsElement.textContent = averageFPS.toPrecision(4)
+                    } else {
+                        const newFPSElement = document.createElement("p")
+                        newFPSElement.className = "fps"
+                        debugElement.appendChild(newFPSElement)
+                    }
+
+                    const frameDeltaElement =
+                        debugElement.querySelector(".frameDelta")
+
+                    if (frameDeltaElement !== null) {
+                        frameDeltaElement.textContent =
+                            averageFrameDelta.toPrecision(3)
+                    } else {
+                        const newFrameDeltaElement = document.createElement("p")
+                        newFrameDeltaElement.className = "frameDelta"
+                        debugElement.appendChild(newFrameDeltaElement)
+                    }
                 } else {
-                    console.log(
+                    console.warn(
                         "Engine received unknown message from host worker: ",
                         msg
                     )
