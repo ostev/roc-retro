@@ -10,6 +10,7 @@ A work-in-progress platform for building retro video games for the Roc programmi
 -   [x] Implement fixed frame rate game loop
 -   [x] Add persistent state
 -   [x] Add keyboard input
+-   [ ] ‼️ Fix memory leaks
 -   [ ] Add mouse input
 -   [ ] Decide on a better name
 -   [ ] Complete audio engine
