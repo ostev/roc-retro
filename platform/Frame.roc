@@ -1,8 +1,8 @@
 interface Frame
     exposes [ Framebuffer, Palette, FrameInfo ]
-    imports [ pf.Input ]
+    imports [ pf.Input, pf.Dimensions.{Dimensions} ]
 
-Framebuffer : { width : Nat, height : Nat, pixels : List U8 }
+Framebuffer : { dimensions: Dimensions, pixels : List U8 }
 
 Palette : List U32
 

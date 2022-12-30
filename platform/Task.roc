@@ -84,8 +84,8 @@ render = \framebuffer, palette ->
         (
             Effect.render
                 framebuffer.pixels
-                framebuffer.width
-                framebuffer.height
+                framebuffer.dimensions.width
+                framebuffer.dimensions.height
                 palette
         )
         (\_ -> Ok {})
