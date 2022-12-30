@@ -11,8 +11,12 @@ A work-in-progress platform for building retro video games for the Roc programmi
 -   [x] Add persistent state
 -   [x] Add keyboard input
 -   [ ] ‼️ Fix memory leaks
+-   [ ] ‼️ Find out why the `roc check` and `roc build` stack overflow
 -   [ ] Add mouse input
 -   [ ] Decide on a better name
 -   [ ] Complete audio engine
 -   [ ] Write documentation
+    -   [x] Write snake example
+    -   [ ] Write snake tutorial
+    -   [ ] Write package documentation
 -   [ ] Create CLI tool for developing games with `roc-retro`
