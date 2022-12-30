@@ -7,16 +7,15 @@ main : Task {} []
 main =
     game {
         fps: 100,
-        init: Pair (List.repeat 10 (256*256) |> Box.box) (Box.box []),
-        # This leaks memory
-        update: \(Pair pixels oldPixels), gamepad ->
-            (Pair (List.repeat 10 (256*256) |> Box.box) oldPixels),
-        render: \(Pair pixels oldPixels) -> {
+        init: List.repeat 0 (256 * 256),
+        update: \pixels, gamepad ->
+            pixels |> List.map (\x -> if x >= 15 then 0 else x + 1),
+        render: \pixels -> {
             framebuffer: {
-                pixels: Box.unbox pixels,
+                pixels: pixels,
                 height: 256,
                 width: 256,
             },
-            palette: Box.unbox oldPixels |> List.map Num.toU32,
+            palette: List.repeat 5 (256 * 256),
         },
     }

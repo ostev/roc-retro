@@ -1,3 +1,4 @@
 zig-cache
 libapp.so
 host.bc
+main.bc
