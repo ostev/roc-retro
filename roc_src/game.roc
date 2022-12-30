@@ -57,6 +57,6 @@ render = \{ snake } ->
 
     framebuffer =
         blankFramebuffer
-        |> Framebuffer.drawSprites sprites
+        |> Sprite.drawSprites sprites
 
     { framebuffer: framebuffer, palette: palette }
